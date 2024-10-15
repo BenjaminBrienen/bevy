@@ -322,11 +322,11 @@ macro_rules! impl_reflect_for_atomic {
                 }
                 fn debug(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                     fmt::Debug::fmt(self, f)
-        }
-    }
+                }
+            }
 
-    // strange rustfmt bug gives this invocation the wrong indentation!
-    #[rustfmt::skip]
+            // strange rustfmt bug gives this invocation the wrong indentation!
+            #[rustfmt::skip]
                     impl_full_reflect!(for $ty where $ty: Any + Send + Sync);
 
             impl FromReflect for $ty

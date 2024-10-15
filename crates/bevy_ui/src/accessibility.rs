@@ -95,7 +95,12 @@ fn button_changed(
 
 fn image_changed(
     mut commands: Commands<'_, '_>,
-    mut query: Query<'_, '_, (Entity, Option<&mut AccessibilityNode>), (Changed<UiImage>, Without<Button>)>,
+    mut query: Query<
+        '_,
+        '_,
+        (Entity, Option<&mut AccessibilityNode>),
+        (Changed<UiImage>, Without<Button>),
+    >,
     ui_children: UiChildren<'_, '_>,
     mut text_reader: TextUiReader<'_, '_>,
 ) {
