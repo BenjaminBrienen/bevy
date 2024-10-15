@@ -548,7 +548,7 @@ pub fn reflect_trait(args: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// ```
 /// #[derive(Default)]
-/// struct RemoteType<'_><T>
+/// struct RemoteType<T>
 /// where
 ///   T: Default + Clone,
 /// {
@@ -562,7 +562,7 @@ pub fn reflect_trait(args: TokenStream, input: TokenStream) -> TokenStream {
 /// ```ignore
 /// use external_crate::RemoteType;
 ///
-/// #[reflect_remote(RemoteType<'_><T>)]
+/// #[reflect_remote(RemoteType<T>)]
 /// #[derive(Default)]
 /// pub struct WrapperType<T: Default + Clone> {
 ///   pub foo: T,
@@ -577,7 +577,7 @@ pub fn reflect_trait(args: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// #[derive(Default)]
 /// #[repr(transparent)]
-/// pub struct Wrapper<T: Default + Clone>(RemoteType<'_><T>);
+/// pub struct Wrapper<T: Default + Clone>(RemoteType<T>);
 /// ```
 ///
 /// # Usage as a Field
