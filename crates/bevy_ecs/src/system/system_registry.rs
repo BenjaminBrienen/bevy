@@ -205,7 +205,7 @@ impl World {
     ///
     /// # Limitations
     ///
-    ///  - Stored systems cannot be recursive, they cannot call themselves through [`Commands::run_system`](crate::system::Commands<'_, '_>).
+    ///  - Stored systems cannot be recursive, they cannot call themselves through [`Commands::run_system`](crate::system::Commands).
     ///
     /// # Examples
     ///
@@ -295,7 +295,7 @@ impl World {
     ///
     /// # Limitations
     ///
-    ///  - Stored systems cannot be recursive, they cannot call themselves through [`Commands::run_system`](crate::system::Commands<'_, '_>).
+    ///  - Stored systems cannot be recursive, they cannot call themselves through [`Commands::run_system`](crate::system::Commands).
     ///
     /// # Examples
     ///
