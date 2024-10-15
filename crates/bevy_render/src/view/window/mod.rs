@@ -338,7 +338,7 @@ pub fn create_surfaces(
     // By accessing a NonSend resource, we tell the scheduler to put this system on the main thread,
     // which is necessary for some OS's
     #[cfg(any(target_os = "macos", target_os = "ios"))] _marker: Option<
-        NonSend<bevy_core::NonSendMarker>,
+        NonSend<'_, bevy_core::NonSendMarker>,
     >,
     windows: Res<'_, ExtractedWindows>,
     mut window_surfaces: ResMut<'_, WindowSurfaces>,
