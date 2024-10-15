@@ -251,11 +251,11 @@ fn setup(
 }
 
 fn update_exposure(
-    key_input: Res<'_, ButtonInput<KeyCode>>,
-    mut parameters: ResMut<'_, Parameters>,
-    mut exposure: Single<'_, &mut Exposure>,
-    text: Single<'_, Entity, With<Text>>,
-    mut writer: UiTextWriter,
+    key_input: Res<ButtonInput<KeyCode>>,
+    mut parameters: ResMut<Parameters>,
+    mut exposure: Single<&mut Exposure>,
+    text: Single<Entity, With<Text>>,
+    mut writer: TextUiWriter,
 ) {
     // TODO: Clamp values to a reasonable range
     let entity = *text;

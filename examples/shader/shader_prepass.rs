@@ -210,12 +210,12 @@ impl Material for PrepassOutputMaterial {
 
 /// Every time you press space, it will cycle between transparent, depth and normals view
 fn toggle_prepass_view(
-    mut prepass_view: Local<'_, u32>,
-    keycode: Res<'_, ButtonInput<KeyCode>>,
-    material_handle: Single<'_, &MeshMaterial3d<PrepassOutputMaterial>>,
-    mut materials: ResMut<'_, Assets<PrepassOutputMaterial>>,
-    text: Single<'_, Entity, With<Text>>,
-    mut writer: UiTextWriter,
+    mut prepass_view: Local<u32>,
+    keycode: Res<ButtonInput<KeyCode>>,
+    material_handle: Single<&MeshMaterial3d<PrepassOutputMaterial>>,
+    mut materials: ResMut<Assets<PrepassOutputMaterial>>,
+    text: Single<Entity, With<Text>>,
+    mut writer: TextUiWriter,
 ) {
     if keycode.just_pressed(KeyCode::Space) {
         *prepass_view = (*prepass_view + 1) % 4;

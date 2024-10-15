@@ -63,11 +63,11 @@ fn setup(
 }
 
 fn toggle_oit(
-    mut commands: Commands<'_, '_>,
-    text: Single<'_, Entity, With<Text>>,
-    keyboard_input: Res<'_, ButtonInput<KeyCode>>,
-    q: Single<'_, (Entity, Has<OrderIndependentTransparencySettings>), With<Camera3d>>,
-    mut text_writer: UiTextWriter,
+    mut commands: Commands,
+    text: Single<Entity, With<Text>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    q: Single<(Entity, Has<OrderIndependentTransparencySettings>), With<Camera3d>>,
+    mut text_writer: TextUiWriter,
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyT) {
         let (e, has_oit) = *q;

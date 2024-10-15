@@ -251,11 +251,11 @@ fn setup_ui(mut commands: Commands<'_, '_>) {
 }
 
 fn keyboard_inputs(
-    mut motion_blur: Single<'_, &mut MotionBlur>,
-    presses: Res<'_, ButtonInput<KeyCode>>,
-    text: Single<'_, Entity, With<Text>>,
-    mut writer: UiTextWriter,
-    mut camera: ResMut<'_, CameraMode>,
+    mut motion_blur: Single<&mut MotionBlur>,
+    presses: Res<ButtonInput<KeyCode>>,
+    text: Single<Entity, With<Text>>,
+    mut writer: TextUiWriter<'_, '_>,
+    mut camera: ResMut<CameraMode>,
 ) {
     if presses.just_pressed(KeyCode::Digit1) {
         motion_blur.shutter_angle -= 0.25;

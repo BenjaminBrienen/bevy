@@ -236,11 +236,11 @@ fn handle_input(keyboard_input: Res<'_, ButtonInput<KeyCode>>, mut stepping: Res
 }
 
 fn update_ui(
-    mut commands: Commands<'_, '_>,
-    state: Res<'_, State>,
-    stepping: Res<'_, Stepping>,
-    ui: Single<'_, (Entity, &Visibility), With<SteppingUi>>,
-    mut writer: UiTextWriter,
+    mut commands: Commands,
+    state: Res<State>,
+    stepping: Res<Stepping>,
+    ui: Single<(Entity, &Visibility), With<SteppingUi>>,
+    mut writer: TextUiWriter,
 ) {
     // ensure the UI is only visible when stepping is enabled
     let (ui, vis) = *ui;

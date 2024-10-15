@@ -563,25 +563,16 @@ fn handle_button_presses(
 
 /// Updates the state of the UI based on the current state.
 fn update_ui_state(
-    mut buttons: Query<
-        '_,
-        '_,
-        (
-            &mut BackgroundColor,
-            &mut BorderColor,
-            &ColorGradingOptionWidget,
-        ),
-    >,
-    button_text: Query<
-        '_,
-        '_,
-        (Entity, &ColorGradingOptionWidget),
-        (With<Text>, Without<HelpText>),
-    >,
-    help_text: Single<'_, Entity, With<HelpText>>,
-    mut writer: UiTextWriter,
-    cameras: Single<'_, Ref<'_, ColorGrading>>,
-    currently_selected_option: Res<'_, SelectedColorGradingOption>,
+    mut buttons: Query<(
+        &mut BackgroundColor,
+        &mut BorderColor,
+        &ColorGradingOptionWidget,
+    )>,
+    button_text: Query<(Entity, &ColorGradingOptionWidget), (With<Text>, Without<HelpText>)>,
+    help_text: Single<Entity, With<HelpText>>,
+    mut writer: TextUiWriter,
+    cameras: Single<Ref<ColorGrading>>,
+    currently_selected_option: Res<SelectedColorGradingOption>,
 ) {
     // Exit early if the UI didn't change
     if !currently_selected_option.is_changed() && !cameras.is_changed() {

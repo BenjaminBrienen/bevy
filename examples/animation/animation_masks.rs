@@ -472,10 +472,10 @@ fn handle_button_toggles(
 
 // A system that updates the UI based on the current app state.
 fn update_ui(
-    mut animation_controls: Query<'_, '_, (&AnimationControl, &mut BackgroundColor, &Children)>,
-    texts: Query<'_, '_, Entity, With<Text>>,
-    mut writer: UiTextWriter,
-    app_state: Res<'_, AppState>,
+    mut animation_controls: Query<(&AnimationControl, &mut BackgroundColor, &Children)>,
+    texts: Query<Entity, With<Text>>,
+    mut writer: TextUiWriter,
+    app_state: Res<AppState>,
 ) {
     for (animation_control, mut background_color, kids) in animation_controls.iter_mut() {
         let enabled =

@@ -409,9 +409,9 @@ fn setup_text(mut commands: Commands<'_, '_>, cameras: Query<'_, '_, (Entity, &C
 }
 
 fn update_text(
-    primitive_state: Res<'_, State<PrimitiveSelected>>,
-    header: Query<'_, '_, Entity, With<HeaderText>>,
-    mut writer: UiTextWriter,
+    primitive_state: Res<State<PrimitiveSelected>>,
+    header: Query<Entity, With<HeaderText>>,
+    mut writer: TextUiWriter,
 ) {
     let new_text = format!("{text}", text = primitive_state.get());
     header.iter().for_each(|header_text| {

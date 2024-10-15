@@ -334,9 +334,9 @@ fn apply_velocity(mut query: Query<'_, '_, (&mut Transform, &Velocity)>, time: R
 }
 
 fn update_scoreboard(
-    score: Res<'_, Score>,
-    score_root: Single<'_, Entity, (With<ScoreboardUi>, With<Text>)>,
-    mut writer: UiTextWriter,
+    score: Res<Score>,
+    score_root: Single<Entity, (With<ScoreboardUi>, With<Text>)>,
+    mut writer: TextUiWriter,
 ) {
     *writer.text(*score_root, 1) = score.to_string();
 }

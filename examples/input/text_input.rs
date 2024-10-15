@@ -73,10 +73,10 @@ fn setup_scene(mut commands: Commands<'_, '_>, asset_server: Res<'_, AssetServer
 }
 
 fn toggle_ime(
-    input: Res<'_, ButtonInput<MouseButton>>,
-    mut window: Single<'_, &mut Window>,
-    status_text: Single<'_, Entity, (With<Node>, With<Text>)>,
-    mut ui_writer: UiTextWriter,
+    input: Res<ButtonInput<MouseButton>>,
+    mut window: Single<&mut Window>,
+    status_text: Single<Entity, (With<Node>, With<Text>)>,
+    mut ui_writer: TextUiWriter,
 ) {
     if input.just_pressed(MouseButton::Left) {
         window.ime_position = window.cursor_position().unwrap();
@@ -105,10 +105,10 @@ fn bubbling_text(
 }
 
 fn listen_ime_events(
-    mut events: EventReader<'_, '_, Ime>,
-    status_text: Single<'_, Entity, (With<Node>, With<Text>)>,
-    mut edit_text: Single<'_, &mut Text2d, (Without<Node>, Without<Bubble>)>,
-    mut ui_writer: UiTextWriter,
+    mut events: EventReader<Ime>,
+    status_text: Single<Entity, (With<Node>, With<Text>)>,
+    mut edit_text: Single<&mut Text2d, (Without<Node>, Without<Bubble>)>,
+    mut ui_writer: TextUiWriter,
 ) {
     for event in events.read() {
         match event {

@@ -6,7 +6,7 @@ use bevy::{
     color::palettes::css::*,
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
-    ui::widget::UiTextWriter,
+    ui::widget::TextUiWriter,
     window::PresentMode,
 };
 
@@ -108,7 +108,7 @@ fn change_text_system(
     time: Res<'_, Time>,
     diagnostics: Res<'_, DiagnosticsStore>,
     query: Query<'_, '_, Entity, With<TextChanges>>,
-    mut writer: UiTextWriter,
+    mut writer: TextUiWriter<'_, '_>,
 ) {
     time_history.push_front(time.elapsed());
     time_history.truncate(120);

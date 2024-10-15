@@ -157,12 +157,12 @@ fn setup(mut commands: Commands<'_, '_>, asset_server: Res<'_, AssetServer>) {
 
 /// Finds the next contributor to display and selects the entity
 fn selection(
-    mut timer: ResMut<'_, SelectionTimer>,
-    mut contributor_selection: ResMut<'_, ContributorSelection>,
-    contributor_root: Single<'_, Entity, (With<ContributorDisplay>, With<Text>)>,
-    mut query: Query<'_, '_, (&Contributor, &mut Sprite, &mut Transform)>,
-    mut writer: UiTextWriter,
-    time: Res<'_, Time>,
+    mut timer: ResMut<SelectionTimer>,
+    mut contributor_selection: ResMut<ContributorSelection>,
+    contributor_root: Single<Entity, (With<ContributorDisplay>, With<Text>)>,
+    mut query: Query<(&Contributor, &mut Sprite, &mut Transform)>,
+    mut writer: TextUiWriter,
+    time: Res<Time>,
 ) {
     if !timer.0.tick(time.delta()).just_finished() {
         return;
@@ -204,7 +204,7 @@ fn select(
     contributor: &Contributor,
     transform: &mut Transform,
     entity: Entity,
-    writer: &mut UiTextWriter,
+    writer: &mut TextUiWriter,
 ) {
     sprite.color = SELECTED.with_hue(contributor.hue).into();
 

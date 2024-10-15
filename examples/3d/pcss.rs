@@ -263,8 +263,8 @@ fn update_radio_buttons(
         ),
         Or<(With<RadioButton>, With<RadioButtonText>)>,
     >,
-    app_status: Res<'_, AppStatus>,
-    mut writer: UiTextWriter,
+    app_status: Res<AppStatus>,
+    mut writer: TextUiWriter,
 ) {
     for (entity, image, has_text, sender) in widgets.iter_mut() {
         let selected = match **sender {

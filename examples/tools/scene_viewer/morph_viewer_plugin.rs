@@ -177,10 +177,10 @@ impl MorphKey {
     }
 }
 fn update_text(
-    controls: Option<ResMut<'_, WeightsControl>>,
-    text: Single<'_, Entity, With<Text>>,
-    morphs: Query<'_, '_, &MorphWeights>,
-    mut writer: UiTextWriter,
+    controls: Option<ResMut<WeightsControl>>,
+    text: Single<Entity, With<Text>>,
+    morphs: Query<&MorphWeights>,
+    mut writer: TextUiWriter,
 ) {
     let Some(mut controls) = controls else {
         return;

@@ -547,10 +547,10 @@ fn collision_system(
 }
 
 fn counter_system(
-    diagnostics: Res<'_, DiagnosticsStore>,
-    counter: Res<'_, BevyCounter>,
-    query: Single<'_, Entity, With<StatsText>>,
-    mut writer: UiTextWriter,
+    diagnostics: Res<DiagnosticsStore>,
+    counter: Res<BevyCounter>,
+    query: Single<Entity, With<StatsText>>,
+    mut writer: TextUiWriter,
 ) {
     let text = *query;
 

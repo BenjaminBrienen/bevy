@@ -141,11 +141,11 @@ fn rotate_camera(mut transform: Single<'_, &mut Transform, With<Camera>>, time: 
 }
 
 fn update_config(
-    mut config_store: ResMut<'_, GizmoConfigStore>,
-    keyboard: Res<'_, ButtonInput<KeyCode>>,
-    time: Res<'_, Time>,
-    color_text_query: Single<'_, Entity, With<GizmoColorText>>,
-    mut writer: UiTextWriter,
+    mut config_store: ResMut<GizmoConfigStore>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    time: Res<Time>,
+    color_text_query: Single<Entity, With<GizmoColorText>>,
+    mut writer: TextUiWriter,
 ) {
     if keyboard.just_pressed(KeyCode::KeyD) {
         for (_, config, _) in config_store.iter_mut() {
