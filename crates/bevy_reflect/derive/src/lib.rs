@@ -14,8 +14,6 @@
 //! [`TypePath`]: crate::derive_type_path
 //! [`reflect_trait`]: macro@reflect_trait
 
-extern crate proc_macro;
-
 mod attribute_parser;
 mod container_attributes;
 mod custom_attributes;
@@ -546,7 +544,7 @@ pub fn reflect_trait(args: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// # Example
 ///
-/// Given a remote type, `RemoteType`:
+/// Given a remote type, `RemoteType<'_>`:
 ///
 /// ```
 /// #[derive(Default)]
@@ -591,8 +589,8 @@ pub fn reflect_trait(args: TokenStream, input: TokenStream) -> TokenStream {
 /// ```ignore
 /// #[derive(Reflect)]
 /// struct SomeStruct {
-///   #[reflect(remote = RemoteTypeWrapper)]
-///   data: RemoteType
+///   #[reflect(remote = RemoteType<'_>Wrapper)]
+///   data: RemoteType<'_>
 /// }
 /// ```
 ///

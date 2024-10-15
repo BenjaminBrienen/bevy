@@ -2,7 +2,6 @@
 //! uniform variable.
 
 use bevy::{
-    asset::LoadState,
     prelude::*,
     reflect::TypePath,
     render::render_resource::{AsBindGroup, ShaderRef},
@@ -28,7 +27,7 @@ struct LoadingTexture {
     handle: Handle<Image>,
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands<'_, '_>, asset_server: Res<'_, AssetServer>) {
     // Start loading the texture.
     commands.insert_resource(LoadingTexture {
         is_loaded: false,
@@ -49,15 +48,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn create_array_texture(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut loading_texture: ResMut<LoadingTexture>,
-    mut images: ResMut<Assets<Image>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ArrayTextureMaterial>>,
+    mut commands: Commands<'_, '_>,
+    asset_server: Res<'_, AssetServer>,
+    mut loading_texture: ResMut<'_, LoadingTexture>,
+    mut images: ResMut<'_, Assets<Image>>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
+    mut materials: ResMut<'_, Assets<ArrayTextureMaterial>>,
 ) {
     if loading_texture.is_loaded
-        || asset_server.load_state(loading_texture.handle.id()) != LoadState::Loaded
+        || !asset_server
+            .load_state(loading_texture.handle.id())
+            .is_loaded()
     {
         return;
     }

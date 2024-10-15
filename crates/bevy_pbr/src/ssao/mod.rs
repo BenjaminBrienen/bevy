@@ -228,9 +228,9 @@ impl ViewNode for SsaoNode {
 
     fn run(
         &self,
-        _graph: &mut RenderGraphContext,
-        render_context: &mut RenderContext,
-        (camera, pipeline_id, bind_groups, view_uniform_offset): QueryItem<Self::ViewQuery>,
+        _graph: &mut RenderGraphContext<'_>,
+        render_context: &mut RenderContext<'_>,
+        (camera, pipeline_id, bind_groups, view_uniform_offset): QueryItem<'_, Self::ViewQuery>,
         world: &World,
     ) -> Result<(), NodeRunError> {
         let pipelines = world.resource::<SsaoPipelines>();
@@ -268,8 +268,8 @@ impl ViewNode for SsaoNode {
                 &[view_uniform_offset.offset],
             );
             preprocess_depth_pass.dispatch_workgroups(
-                div_ceil(camera_size.x, 16),
-                div_ceil(camera_size.y, 16),
+                camera_size.x.div_ceil(16),
+                camera_size.y.div_ceil(16),
                 1,
             );
         }
@@ -289,11 +289,7 @@ impl ViewNode for SsaoNode {
                 &bind_groups.common_bind_group,
                 &[view_uniform_offset.offset],
             );
-            ssao_pass.dispatch_workgroups(
-                div_ceil(camera_size.x, 8),
-                div_ceil(camera_size.y, 8),
-                1,
-            );
+            ssao_pass.dispatch_workgroups(camera_size.x.div_ceil(8), camera_size.y.div_ceil(8), 1);
         }
 
         {
@@ -312,8 +308,8 @@ impl ViewNode for SsaoNode {
                 &[view_uniform_offset.offset],
             );
             spatial_denoise_pass.dispatch_workgroups(
-                div_ceil(camera_size.x, 8),
-                div_ceil(camera_size.y, 8),
+                camera_size.x.div_ceil(8),
+                camera_size.y.div_ceil(8),
                 1,
             );
         }
@@ -519,9 +515,13 @@ impl SpecializedComputePipeline for SsaoPipelines {
 }
 
 fn extract_ssao_settings(
-    mut commands: Commands,
+    mut commands: Commands<'_, '_>,
     cameras: Extract<
+        '_,
+        '_,
         Query<
+            '_,
+            '_,
             (RenderEntity, &Camera, &ScreenSpaceAmbientOcclusion, &Msaa),
             (With<Camera3d>, With<DepthPrepass>, With<NormalPrepass>),
         >,
@@ -529,10 +529,7 @@ fn extract_ssao_settings(
 ) {
     for (entity, camera, ssao_settings, msaa) in &cameras {
         if *msaa != Msaa::Off {
-            error!(
-                "SSAO is being used which requires Msaa::Off, but Msaa is currently set to Msaa::{:?}",
-                *msaa
-            );
+            error!("SSAO is being used which requires Msaa::Off, but Msaa is currently set to Msaa::{:?}", *msaa);
             return;
         }
         if camera.is_active {
@@ -554,10 +551,10 @@ pub struct ScreenSpaceAmbientOcclusionResources {
 }
 
 fn prepare_ssao_textures(
-    mut commands: Commands,
-    mut texture_cache: ResMut<TextureCache>,
-    render_device: Res<RenderDevice>,
-    views: Query<(Entity, &ExtractedCamera, &ScreenSpaceAmbientOcclusion)>,
+    mut commands: Commands<'_, '_>,
+    mut texture_cache: ResMut<'_, TextureCache>,
+    render_device: Res<'_, RenderDevice>,
+    views: Query<'_, '_, (Entity, &ExtractedCamera, &ScreenSpaceAmbientOcclusion)>,
 ) {
     for (entity, camera, ssao_settings) in &views {
         let Some(physical_viewport_size) = camera.physical_viewport_size else {
@@ -647,11 +644,11 @@ fn prepare_ssao_textures(
 struct SsaoPipelineId(CachedComputePipelineId);
 
 fn prepare_ssao_pipelines(
-    mut commands: Commands,
-    pipeline_cache: Res<PipelineCache>,
-    mut pipelines: ResMut<SpecializedComputePipelines<SsaoPipelines>>,
-    pipeline: Res<SsaoPipelines>,
-    views: Query<(Entity, &ScreenSpaceAmbientOcclusion, Has<TemporalJitter>)>,
+    mut commands: Commands<'_, '_>,
+    pipeline_cache: Res<'_, PipelineCache>,
+    mut pipelines: ResMut<'_, SpecializedComputePipelines<SsaoPipelines>>,
+    pipeline: Res<'_, SsaoPipelines>,
+    views: Query<'_, '_, (Entity, &ScreenSpaceAmbientOcclusion, Has<TemporalJitter>)>,
 ) {
     for (entity, ssao_settings, temporal_jitter) in &views {
         let pipeline_id = pipelines.specialize(
@@ -676,16 +673,20 @@ struct SsaoBindGroups {
 }
 
 fn prepare_ssao_bind_groups(
-    mut commands: Commands,
-    render_device: Res<RenderDevice>,
-    pipelines: Res<SsaoPipelines>,
-    view_uniforms: Res<ViewUniforms>,
-    global_uniforms: Res<GlobalsBuffer>,
-    views: Query<(
-        Entity,
-        &ScreenSpaceAmbientOcclusionResources,
-        &ViewPrepassTextures,
-    )>,
+    mut commands: Commands<'_, '_>,
+    render_device: Res<'_, RenderDevice>,
+    pipelines: Res<'_, SsaoPipelines>,
+    view_uniforms: Res<'_, ViewUniforms>,
+    global_uniforms: Res<'_, GlobalsBuffer>,
+    views: Query<
+        '_,
+        '_,
+        (
+            Entity,
+            &ScreenSpaceAmbientOcclusionResources,
+            &ViewPrepassTextures,
+        ),
+    >,
 ) {
     let (Some(view_uniforms), Some(globals_uniforms)) = (
         view_uniforms.uniforms.binding(),
@@ -804,9 +805,4 @@ fn hilbert_index(mut x: u16, mut y: u16) -> u16 {
     }
 
     index
-}
-
-/// Divide `numerator` by `denominator`, rounded up to the nearest multiple of `denominator`.
-fn div_ceil(numerator: u32, denominator: u32) -> u32 {
-    (numerator + denominator - 1) / denominator
 }

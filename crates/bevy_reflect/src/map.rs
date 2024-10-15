@@ -74,7 +74,7 @@ pub trait Map: PartialReflect {
     }
 
     /// Returns an iterator over the key-value pairs of the map.
-    fn iter(&self) -> MapIter;
+    fn iter(&self) -> MapIter<'_>;
 
     /// Drain the key-value pairs of this map to get a vector of owned values.
     ///
@@ -99,6 +99,11 @@ pub trait Map: PartialReflect {
     /// If the map did not have this key present, `None` is returned.
     /// If the map did have this key present, the removed value is returned.
     fn remove(&mut self, key: &dyn PartialReflect) -> Option<Box<dyn PartialReflect>>;
+
+    /// Will return `None` if [`TypeInfo`] is not available.
+    fn get_represented_map_info(&self) -> Option<&'static MapInfo> {
+        self.get_represented_type_info()?.as_map().ok()
+    }
 }
 
 /// A container for compile-time map info.
@@ -185,24 +190,17 @@ macro_rules! hash_error {
     ( $key:expr ) => {{
         let type_path = (*$key).reflect_type_path();
         if !$key.is_dynamic() {
-            format!(
-                "the given key of type `{}` does not support hashing",
-                type_path
-            )
+            format!("the given key of type `{}` does not support hashing", type_path)
         } else {
             match (*$key).get_represented_type_info() {
                 // Handle dynamic types that do not represent a type (i.e a plain `DynamicStruct`):
                 None => format!("the dynamic type `{}` does not support hashing", type_path),
                 // Handle dynamic types that do represent a type (i.e. a `DynamicStruct` proxying `Foo`):
-                Some(s) => format!(
-                    "the dynamic type `{}` (representing `{}`) does not support hashing",
-                    type_path,
-                    s.type_path()
-                ),
+                Some(s) => format!("the dynamic type `{}` (representing `{}`) does not support hashing", type_path, s.type_path()),
             }
         }
         .as_str()
-    }}
+    }};
 }
 
 /// An ordered mapping between reflected values.
@@ -247,9 +245,7 @@ impl DynamicMap {
         values: &'a [(Box<dyn PartialReflect>, Box<dyn PartialReflect>)],
     ) -> impl FnMut(&usize) -> bool + 'a {
         |&index| {
-            value
-            .reflect_partial_eq(&*values[index].0)
-            .expect("underlying type does not reflect `PartialEq` and hence doesn't support equality checks")
+            value.reflect_partial_eq(&*values[index].0).expect("underlying type does not reflect `PartialEq` and hence doesn't support equality checks")
         }
     }
 }
@@ -290,7 +286,7 @@ impl Map for DynamicMap {
         self.values.len()
     }
 
-    fn iter(&self) -> MapIter {
+    fn iter(&self) -> MapIter<'_> {
         MapIter::new(self)
     }
 
@@ -356,10 +352,7 @@ impl Map for DynamicMap {
                 // whose index needs to be fixed up.
                 if let Some((moved_key, _)) = self.values.get(index) {
                     let hash = Self::internal_hash(&**moved_key);
-                    let moved_index = self
-                        .indices
-                        .find_mut(hash, |&moved_index| moved_index == self.values.len())
-                        .expect("key inserted in a `DynamicMap` is no longer present, this means its reflected `Hash` might be incorrect");
+                    let moved_index = self.indices.find_mut(hash, |&moved_index| moved_index == self.values.len()).expect("key inserted in a `DynamicMap` is no longer present, this means its reflected `Hash` might be incorrect");
                     *moved_index = index;
                 }
 
@@ -415,11 +408,11 @@ impl PartialReflect for DynamicMap {
         ReflectKind::Map
     }
 
-    fn reflect_ref(&self) -> ReflectRef {
+    fn reflect_ref(&self) -> ReflectRef<'_> {
         ReflectRef::Map(self)
     }
 
-    fn reflect_mut(&mut self) -> ReflectMut {
+    fn reflect_mut(&mut self) -> ReflectMut<'_> {
         ReflectMut::Map(self)
     }
 
@@ -464,7 +457,7 @@ pub struct MapIter<'a> {
 impl MapIter<'_> {
     /// Creates a new [`MapIter`].
     #[inline]
-    pub const fn new(map: &dyn Map) -> MapIter {
+    pub const fn new(map: &dyn Map) -> MapIter<'_> {
         MapIter { map, index: 0 }
     }
 }

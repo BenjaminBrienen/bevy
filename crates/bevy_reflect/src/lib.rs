@@ -1865,6 +1865,41 @@ mod tests {
     }
 
     #[test]
+    fn get_represented_kind_info() {
+        #[derive(Reflect)]
+        struct SomeStruct;
+
+        #[derive(Reflect)]
+        struct SomeTupleStruct(f32);
+
+        #[derive(Reflect)]
+        enum SomeEnum {
+            Foo,
+            Bar,
+        }
+
+        let dyn_struct: &dyn Struct = &SomeStruct;
+        let _: &StructInfo = dyn_struct.get_represented_struct_info().unwrap();
+
+        let dyn_map: &dyn Map = &HashMap::<(), ()>::default();
+        let _: &MapInfo = dyn_map.get_represented_map_info().unwrap();
+
+        let dyn_array: &dyn Array = &[1, 2, 3];
+        let _: &ArrayInfo = dyn_array.get_represented_array_info().unwrap();
+
+        let dyn_list: &dyn List = &vec![1, 2, 3];
+        let _: &ListInfo = dyn_list.get_represented_list_info().unwrap();
+
+        let dyn_tuple_struct: &dyn TupleStruct = &SomeTupleStruct(5.0);
+        let _: &TupleStructInfo = dyn_tuple_struct
+            .get_represented_tuple_struct_info()
+            .unwrap();
+
+        let dyn_enum: &dyn Enum = &SomeEnum::Foo;
+        let _: &EnumInfo = dyn_enum.get_represented_enum_info().unwrap();
+    }
+
+    #[test]
     fn should_permit_higher_ranked_lifetimes() {
         #[derive(Reflect)]
         #[reflect(from_reflect = false)]
@@ -1936,10 +1971,7 @@ mod tests {
             struct SomeStruct;
 
             let info = <SomeStruct as Typed>::type_info();
-            assert_eq!(
-                Some(" Some struct.\n\n # Example\n\n ```ignore (This is only used for a unit test, no need to doc test)\n let some_struct = SomeStruct;\n ```"),
-                info.docs()
-            );
+            assert_eq!(Some(" Some struct.\n\n # Example\n\n ```ignore (This is only used for a unit test, no need to doc test)\n let some_struct = SomeStruct;\n ```"), info.docs());
 
             #[doc = "The compiler automatically converts `///`-style comments into `#[doc]` attributes."]
             #[doc = "Of course, you _could_ use the attribute directly if you wanted to."]
@@ -1948,10 +1980,7 @@ mod tests {
             struct SomeOtherStruct;
 
             let info = <SomeOtherStruct as Typed>::type_info();
-            assert_eq!(
-                Some("The compiler automatically converts `///`-style comments into `#[doc]` attributes.\nOf course, you _could_ use the attribute directly if you wanted to.\nBoth will be reflected."),
-                info.docs()
-            );
+            assert_eq!(Some("The compiler automatically converts `///`-style comments into `#[doc]` attributes.\nOf course, you _could_ use the attribute directly if you wanted to.\nBoth will be reflected."), info.docs());
 
             /// Some tuple struct.
             #[derive(Reflect)]
@@ -2867,7 +2896,7 @@ bevy_reflect::tests::Test {
             .expect("should downcast to `external_crate::TheirType`");
         assert_eq!(
             external_crate::TheirType {
-                value: "Hello".to_string(),
+                value: "Hello".to_string()
             },
             output
         );
@@ -2899,7 +2928,7 @@ bevy_reflect::tests::Test {
             .expect("should downcast to `external_crate::TheirType`");
         assert_eq!(
             external_crate::TheirType {
-                value: "Hello".to_string(),
+                value: "Hello".to_string()
             },
             output,
         );
@@ -2934,7 +2963,7 @@ bevy_reflect::tests::Test {
             .expect("should downcast to `external_crate::TheirOuter`");
         assert_eq!(
             external_crate::TheirOuter {
-                inner: external_crate::TheirInner(123),
+                inner: external_crate::TheirInner(123)
             },
             output
         );

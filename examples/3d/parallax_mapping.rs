@@ -54,7 +54,7 @@ impl Default for CurrentMethod {
     }
 }
 impl fmt::Display for CurrentMethod {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             ParallaxMappingMethod::Occlusion => write!(f, "Parallax Occlusion Mapping"),
             ParallaxMappingMethod::Relief { max_steps } => {
@@ -80,7 +80,7 @@ fn update_parallax_depth_scale(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut target_depth: Local<TargetDepth>,
     mut depth_update: Local<bool>,
-    mut writer: UiTextWriter,
+    mut writer: TextUiWriter,
     text: Single<Entity, With<Text>>,
 ) {
     if input.just_pressed(KeyCode::Digit1) {
@@ -110,7 +110,7 @@ fn switch_method(
     input: Res<ButtonInput<KeyCode>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     text: Single<Entity, With<Text>>,
-    mut writer: UiTextWriter,
+    mut writer: TextUiWriter,
     mut current: Local<CurrentMethod>,
 ) {
     if input.just_pressed(KeyCode::Space) {
@@ -131,7 +131,7 @@ fn update_parallax_layers(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut target_layers: Local<TargetLayers>,
     text: Single<Entity, With<Text>>,
-    mut writer: UiTextWriter,
+    mut writer: TextUiWriter,
 ) {
     if input.just_pressed(KeyCode::Digit3) {
         target_layers.0 -= 1.0;
@@ -150,7 +150,7 @@ fn update_parallax_layers(
     }
 }
 
-fn spin(time: Res<Time>, mut query: Query<(&mut Transform, &Spin)>) {
+fn spin(time: Res<'_, Time>, mut query: Query<'_, '_, (&mut Transform, &Spin)>) {
     for (mut transform, spin) in query.iter_mut() {
         transform.rotate_local_y(spin.speed * time.delta_seconds());
         transform.rotate_local_x(spin.speed * time.delta_seconds());
@@ -183,9 +183,9 @@ const CAMERA_POSITIONS: &[Transform] = &[
 ];
 
 fn move_camera(
-    mut camera: Single<&mut Transform, With<CameraController>>,
-    mut current_view: Local<usize>,
-    button: Res<ButtonInput<MouseButton>>,
+    mut camera: Single<'_, &mut Transform, With<CameraController>>,
+    mut current_view: Local<'_, usize>,
+    button: Res<'_, ButtonInput<MouseButton>>,
 ) {
     if button.just_pressed(MouseButton::Left) {
         *current_view = (*current_view + 1) % CAMERA_POSITIONS.len();
@@ -196,10 +196,10 @@ fn move_camera(
 }
 
 fn setup(
-    mut commands: Commands,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    asset_server: Res<AssetServer>,
+    mut commands: Commands<'_, '_>,
+    mut materials: ResMut<'_, Assets<StandardMaterial>>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
+    asset_server: Res<'_, AssetServer>,
 ) {
     // The normal map. Note that to generate it in the GIMP image editor, you should
     // open the depth map, and do Filters → Generic → Normal Map

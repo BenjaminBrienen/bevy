@@ -352,7 +352,7 @@ impl AssetInfos {
     }
 
     /// Returns `true` if the asset at this path should be reloaded
-    pub(crate) fn should_reload(&self, path: &AssetPath) -> bool {
+    pub(crate) fn should_reload(&self, path: &AssetPath<'_>) -> bool {
         if self.is_path_alive(path) {
             return true;
         }
@@ -400,12 +400,9 @@ impl AssetInfos {
         loading_deps.retain(|dep_id| {
             if let Some(dep_info) = self.get_mut(*dep_id) {
                 match dep_info.rec_dep_load_state {
-                    RecursiveDependencyLoadState::Loading
-                    | RecursiveDependencyLoadState::NotLoaded => {
+                    RecursiveDependencyLoadState::Loading | RecursiveDependencyLoadState::NotLoaded => {
                         // If dependency is loading, wait for it.
-                        dep_info
-                            .dependants_waiting_on_recursive_dep_load
-                            .insert(loaded_asset_id);
+                        dep_info.dependants_waiting_on_recursive_dep_load.insert(loaded_asset_id);
                     }
                     RecursiveDependencyLoadState::Loaded => {
                         // If dependency is loaded, reduce our count by one
@@ -439,10 +436,7 @@ impl AssetInfos {
                 }
             } else {
                 // the dependency id does not exist, which implies it was manually removed or never existed in the first place
-                warn!(
-                    "Dependency {:?} from asset {:?} is unknown. This asset's dependency load status will not switch to 'Loaded' until the unknown dependency is loaded.",
-                    dep_id, loaded_asset_id
-                );
+                warn!("Dependency {:?} from asset {:?} is unknown. This asset's dependency load status will not switch to 'Loaded' until the unknown dependency is loaded.", dep_id, loaded_asset_id);
                 true
             }
         });
@@ -498,16 +492,14 @@ impl AssetInfos {
                 info.loader_dependencies = loaded_asset.loader_dependencies;
             }
 
-            let dependants_waiting_on_rec_load = if matches!(
-                rec_dep_load_state,
-                RecursiveDependencyLoadState::Loaded | RecursiveDependencyLoadState::Failed(_)
-            ) {
-                Some(core::mem::take(
-                    &mut info.dependants_waiting_on_recursive_dep_load,
-                ))
-            } else {
-                None
-            };
+            let dependants_waiting_on_rec_load =
+                if rec_dep_load_state.is_loaded() || rec_dep_load_state.is_failed() {
+                    Some(core::mem::take(
+                        &mut info.dependants_waiting_on_recursive_dep_load,
+                    ))
+                } else {
+                    None
+                };
 
             (
                 core::mem::take(&mut info.dependants_waiting_on_load),
@@ -518,9 +510,7 @@ impl AssetInfos {
         for id in dependants_waiting_on_load {
             if let Some(info) = self.get_mut(id) {
                 info.loading_dependencies.remove(&loaded_asset_id);
-                if info.loading_dependencies.is_empty()
-                    && !matches!(info.dep_load_state, DependencyLoadState::Failed(_))
-                {
+                if info.loading_dependencies.is_empty() && !info.dep_load_state.is_failed() {
                     // send dependencies loaded event
                     info.dep_load_state = DependencyLoadState::Loaded;
                 }
@@ -558,7 +548,7 @@ impl AssetInfos {
             info.loading_rec_dependencies.remove(&loaded_id);
             if info.loading_rec_dependencies.is_empty() && info.failed_rec_dependencies.is_empty() {
                 info.rec_dep_load_state = RecursiveDependencyLoadState::Loaded;
-                if info.load_state == LoadState::Loaded {
+                if info.load_state.is_loaded() {
                     sender
                         .send(InternalAssetEvent::LoadedWithDependencies { id: waiting_id })
                         .unwrap();
@@ -631,7 +621,7 @@ impl AssetInfos {
                 info.loading_dependencies.remove(&failed_id);
                 info.failed_dependencies.insert(failed_id);
                 // don't overwrite DependencyLoadState if already failed to preserve first error
-                if !(matches!(info.dep_load_state, DependencyLoadState::Failed(_))) {
+                if !info.dep_load_state.is_failed() {
                     info.dep_load_state = DependencyLoadState::Failed(error.clone());
                 }
             }
@@ -777,12 +767,16 @@ pub(crate) fn unwrap_with_context<T>(
         Err(GetOrCreateHandleInternalError::HandleMissingButTypeIdNotSpecified) => None,
         Err(GetOrCreateHandleInternalError::MissingHandleProviderError(_)) => match type_info {
             Either::Left(type_name) => {
-                panic!("Cannot allocate an Asset Handle of type '{type_name}' because the asset type has not been initialized. \
-                    Make sure you have called `app.init_asset::<{type_name}>()`");
+                panic!(
+                    "Cannot allocate an Asset Handle of type '{type_name}' because the asset type has not been initialized. \
+                    Make sure you have called `app.init_asset::<{type_name}>()`"
+                );
             }
             Either::Right(type_id) => {
-                panic!("Cannot allocate an AssetHandle of type '{type_id:?}' because the asset type has not been initialized. \
-                    Make sure you have called `app.init_asset::<(actual asset type)>()`")
+                panic!(
+                    "Cannot allocate an AssetHandle of type '{type_id:?}' because the asset type has not been initialized. \
+                    Make sure you have called `app.init_asset::<(actual asset type)>()`"
+                )
             }
         },
     }

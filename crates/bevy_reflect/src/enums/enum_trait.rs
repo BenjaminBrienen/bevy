@@ -114,7 +114,7 @@ pub trait Enum: PartialReflect {
     /// For non-[`VariantType::Struct`] variants, this should return `None`.
     fn name_at(&self, index: usize) -> Option<&str>;
     /// Returns an iterator over the values of the current variant's fields.
-    fn iter_fields(&self) -> VariantFieldIter;
+    fn iter_fields(&self) -> VariantFieldIter<'_>;
     /// Returns the number of fields in the current variant.
     fn field_len(&self) -> usize;
     /// The name of the current variant.
@@ -132,6 +132,13 @@ pub trait Enum: PartialReflect {
     /// Returns the full path to the current variant.
     fn variant_path(&self) -> String {
         format!("{}::{}", self.reflect_type_path(), self.variant_name())
+    }
+
+    /// Will return `None` if [`TypeInfo`] is not available.
+    ///
+    /// [`TypeInfo`]: crate::TypeInfo
+    fn get_represented_enum_info(&self) -> Option<&'static EnumInfo> {
+        self.get_represented_type_info()?.as_enum().ok()
     }
 }
 

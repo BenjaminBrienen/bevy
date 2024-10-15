@@ -1,6 +1,6 @@
 //! This example shows how to configure Physically Based Rendering (PBR) parameters.
 
-use bevy::{asset::LoadState, prelude::*, render::camera::ScalingMode};
+use bevy::{prelude::*, render::camera::ScalingMode};
 
 fn main() {
     App::new()
@@ -12,10 +12,10 @@ fn main() {
 
 /// set up a simple 3D scene
 fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
+    mut commands: Commands<'_, '_>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
+    mut materials: ResMut<'_, Assets<StandardMaterial>>,
+    asset_server: Res<'_, AssetServer>,
 ) {
     let sphere_mesh = meshes.add(Sphere::new(0.45));
     // add entities to the world
@@ -123,14 +123,18 @@ fn setup(
 }
 
 fn environment_map_load_finish(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    environment_maps: Query<&EnvironmentMapLight>,
-    label_query: Query<Entity, With<EnvironmentMapLabel>>,
+    mut commands: Commands<'_, '_>,
+    asset_server: Res<'_, AssetServer>,
+    environment_maps: Query<'_, '_, &EnvironmentMapLight>,
+    label_query: Query<'_, '_, Entity, With<EnvironmentMapLabel>>,
 ) {
     if let Ok(environment_map) = environment_maps.get_single() {
-        if asset_server.load_state(&environment_map.diffuse_map) == LoadState::Loaded
-            && asset_server.load_state(&environment_map.specular_map) == LoadState::Loaded
+        if asset_server
+            .load_state(&environment_map.diffuse_map)
+            .is_loaded()
+            && asset_server
+                .load_state(&environment_map.specular_map)
+                .is_loaded()
         {
             if let Ok(label_entity) = label_query.get_single() {
                 commands.entity(label_entity).despawn();

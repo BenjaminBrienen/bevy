@@ -53,10 +53,15 @@ pub trait TupleStruct: PartialReflect {
     fn field_len(&self) -> usize;
 
     /// Returns an iterator over the values of the tuple struct's fields.
-    fn iter_fields(&self) -> TupleStructFieldIter;
+    fn iter_fields(&self) -> TupleStructFieldIter<'_>;
 
     /// Clones the struct into a [`DynamicTupleStruct`].
     fn clone_dynamic(&self) -> DynamicTupleStruct;
+
+    /// Will return `None` if [`TypeInfo`] is not available.
+    fn get_represented_tuple_struct_info(&self) -> Option<&'static TupleStructInfo> {
+        self.get_represented_type_info()?.as_tuple_struct().ok()
+    }
 }
 
 /// A container for compile-time tuple struct info.
@@ -268,7 +273,7 @@ impl TupleStruct for DynamicTupleStruct {
     }
 
     #[inline]
-    fn iter_fields(&self) -> TupleStructFieldIter {
+    fn iter_fields(&self) -> TupleStructFieldIter<'_> {
         TupleStructFieldIter {
             tuple_struct: self,
             index: 0,
@@ -338,12 +343,12 @@ impl PartialReflect for DynamicTupleStruct {
     }
 
     #[inline]
-    fn reflect_ref(&self) -> ReflectRef {
+    fn reflect_ref(&self) -> ReflectRef<'_> {
         ReflectRef::TupleStruct(self)
     }
 
     #[inline]
-    fn reflect_mut(&mut self) -> ReflectMut {
+    fn reflect_mut(&mut self) -> ReflectMut<'_> {
         ReflectMut::TupleStruct(self)
     }
 

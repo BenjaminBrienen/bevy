@@ -44,7 +44,6 @@ use core::{
 ///
 /// [struct-like]: https://doc.rust-lang.org/book/ch05-01-defining-structs.html
 /// [reflection]: crate
-
 /// [unit structs]: https://doc.rust-lang.org/book/ch05-01-defining-structs.html#unit-like-structs-without-any-fields
 pub trait Struct: PartialReflect {
     /// Returns a reference to the value of the field named `name` as a `&dyn
@@ -70,10 +69,15 @@ pub trait Struct: PartialReflect {
     fn field_len(&self) -> usize;
 
     /// Returns an iterator over the values of the reflectable fields for this struct.
-    fn iter_fields(&self) -> FieldIter;
+    fn iter_fields(&self) -> FieldIter<'_>;
 
     /// Clones the struct into a [`DynamicStruct`].
     fn clone_dynamic(&self) -> DynamicStruct;
+
+    /// Will return `None` if [`TypeInfo`] is not available.
+    fn get_represented_struct_info(&self) -> Option<&'static StructInfo> {
+        self.get_represented_type_info()?.as_struct().ok()
+    }
 }
 
 /// A container for compile-time named struct info.
@@ -298,7 +302,7 @@ impl DynamicStruct {
         name: impl Into<Cow<'a, str>>,
         value: Box<dyn PartialReflect>,
     ) {
-        let name: Cow<str> = name.into();
+        let name: Cow<'_, str> = name.into();
         if let Some(index) = self.field_indices.get(&name) {
             self.fields[*index] = value;
         } else {
@@ -360,7 +364,7 @@ impl Struct for DynamicStruct {
     }
 
     #[inline]
-    fn iter_fields(&self) -> FieldIter {
+    fn iter_fields(&self) -> FieldIter<'_> {
         FieldIter {
             struct_val: self,
             index: 0,
@@ -431,12 +435,12 @@ impl PartialReflect for DynamicStruct {
     }
 
     #[inline]
-    fn reflect_ref(&self) -> ReflectRef {
+    fn reflect_ref(&self) -> ReflectRef<'_> {
         ReflectRef::Struct(self)
     }
 
     #[inline]
-    fn reflect_mut(&mut self) -> ReflectMut {
+    fn reflect_mut(&mut self) -> ReflectMut<'_> {
         ReflectMut::Struct(self)
     }
 

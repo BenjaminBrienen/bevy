@@ -461,10 +461,9 @@ impl BundleInfo {
     }
 
     /// Returns an iterator over the [ID](ComponentId) of each component explicitly defined in this bundle (ex: this excludes Required Components).
-
     /// To iterate all components contributed by this bundle (including Required Components), see [`BundleInfo::iter_contributed_components`]
     #[inline]
-    pub fn iter_explicit_components(&self) -> impl Iterator<Item = ComponentId> + '_ {
+    pub fn iter_explicit_components(&self) -> impl Iterator<Item = ComponentId> + Clone + '_ {
         self.explicit_components().iter().copied()
     }
 
@@ -472,7 +471,7 @@ impl BundleInfo {
     ///
     /// To iterate only components explicitly defined in this bundle, see [`BundleInfo::iter_explicit_components`]
     #[inline]
-    pub fn iter_contributed_components(&self) -> impl Iterator<Item = ComponentId> + '_ {
+    pub fn iter_contributed_components(&self) -> impl Iterator<Item = ComponentId> + Clone + '_ {
         self.component_ids.iter().copied()
     }
 
@@ -598,7 +597,7 @@ impl BundleInfo {
         entity: Entity,
         component_id: ComponentId,
         storage_type: StorageType,
-        component_ptr: OwningPtr,
+        component_ptr: OwningPtr<'_>,
         #[cfg(feature = "track_change_detection")] caller: &'static Location<'static>,
     ) {
         {
@@ -1333,7 +1332,7 @@ impl Bundles {
     ) -> BundleId {
         let bundle_infos = &mut self.bundle_infos;
         let id = *self.bundle_ids.entry(TypeId::of::<T>()).or_insert_with(|| {
-            let mut component_ids= Vec::new();
+            let mut component_ids = Vec::new();
             T::component_ids(components, storages, &mut |id| component_ids.push(id));
             let id = BundleId(bundle_infos.len());
             let bundle_info =
@@ -1461,13 +1460,7 @@ fn initialize_dynamic_bundle(
     component_ids: Vec<ComponentId>,
 ) -> (BundleId, Vec<StorageType>) {
     // Assert component existence
-    let storage_types = component_ids.iter().map(|&id| {
-        components.get_info(id).unwrap_or_else(|| {
-            panic!(
-                "init_dynamic_info called with component id {id:?} which doesn't exist in this world"
-            )
-        }).storage_type()
-    }).collect();
+    let storage_types = component_ids.iter().map(|&id| components.get_info(id).unwrap_or_else(|| panic!("init_dynamic_info called with component id {id:?} which doesn't exist in this world")).storage_type()).collect();
 
     let id = BundleId(bundle_infos.len());
     let bundle_info =
@@ -1490,19 +1483,19 @@ mod tests {
     #[component(on_add = a_on_add, on_insert = a_on_insert, on_replace = a_on_replace, on_remove = a_on_remove)]
     struct AMacroHooks;
 
-    fn a_on_add(mut world: DeferredWorld, _: Entity, _: ComponentId) {
+    fn a_on_add(mut world: DeferredWorld<'_>, _: Entity, _: ComponentId) {
         world.resource_mut::<R>().assert_order(0);
     }
 
-    fn a_on_insert<T1, T2>(mut world: DeferredWorld, _: T1, _: T2) {
+    fn a_on_insert<T1, T2>(mut world: DeferredWorld<'_>, _: T1, _: T2) {
         world.resource_mut::<R>().assert_order(1);
     }
 
-    fn a_on_replace<T1, T2>(mut world: DeferredWorld, _: T1, _: T2) {
+    fn a_on_replace<T1, T2>(mut world: DeferredWorld<'_>, _: T1, _: T2) {
         world.resource_mut::<R>().assert_order(2);
     }
 
-    fn a_on_remove<T1, T2>(mut world: DeferredWorld, _: T1, _: T2) {
+    fn a_on_remove<T1, T2>(mut world: DeferredWorld<'_>, _: T1, _: T2) {
         world.resource_mut::<R>().assert_order(3);
     }
 

@@ -99,7 +99,7 @@ impl TaskPool {
     pub fn scope_with_executor<'env, F, T>(
         &self,
         _tick_task_pool_executor: bool,
-        _thread_executor: Option<&ThreadExecutor>,
+        _thread_executor: Option<&ThreadExecutor<'_>>,
         f: F,
     ) -> Vec<T>
     where
@@ -192,7 +192,7 @@ impl TaskPool {
     /// ```
     pub fn with_local_executor<F, R>(&self, f: F) -> R
     where
-        F: FnOnce(&async_executor::LocalExecutor) -> R,
+        F: FnOnce(&async_executor::LocalExecutor<'_>) -> R,
     {
         LOCAL_EXECUTOR.with(f)
     }

@@ -146,10 +146,12 @@ pub fn spawn_ui_text<'a>(
 /// as necessary.
 pub fn handle_ui_interactions<T>(
     mut interactions: Query<
+        '_,
+        '_,
         (&Interaction, &WidgetClickSender<T>),
         (With<Button>, With<RadioButton>),
     >,
-    mut widget_click_events: EventWriter<WidgetClickEvent<T>>,
+    mut widget_click_events: EventWriter<'_, WidgetClickEvent<T>>,
 ) where
     T: Clone + Send + Sync + 'static,
 {
@@ -168,7 +170,7 @@ pub fn update_ui_radio_button(background_color: &mut BackgroundColor, selected: 
 
 /// Updates the color of the label of a radio button to reflect its selected
 /// status.
-pub fn update_ui_radio_button_text(entity: Entity, writer: &mut UiTextWriter, selected: bool) {
+pub fn update_ui_radio_button_text(entity: Entity, writer: &mut TextUiWriter, selected: bool) {
     let text_color = if selected { Color::BLACK } else { Color::WHITE };
 
     writer.for_each_color(entity, |mut color| {

@@ -32,6 +32,18 @@ use bevy_transform::prelude::GlobalTransform;
 use bevy_utils::HashSet;
 use bevy_window::{PrimaryWindow, Window, WindowScaleFactorChanged};
 
+/// [`Text2dBundle`] was removed in favor of required components.
+/// The core component is now [`Text2d`] which can contain a single text segment.
+/// Indexed access to segments can be done with the new [`Text2dReader`] and [`Text2dWriter`] system params.
+/// Additional segments can be added through children with [`TextSpan`](crate::text::TextSpan).
+/// Text configuration can be done with [`TextLayout`], [`TextFont`] and [`TextColor`],
+/// while sprite-related configuration uses [`TextBounds`] and [`Anchor`] components.
+#[deprecated(
+    since = "0.15.0",
+    note = "Text2dBundle has been migrated to required components. Follow the documentation for more information."
+)]
+pub struct Text2dBundle {}
+
 /// The top-level 2D text component.
 ///
 /// Adding `Text2d` to an entity will pull in required components for setting up 2d text.
@@ -120,29 +132,35 @@ impl From<String> for Text2d {
 }
 
 /// 2d alias for [`TextReader`].
-pub type TextReader2d<'w, 's> = TextReader<'w, 's, Text2d>;
+pub type Text2dReader<'w, 's> = TextReader<'w, 's, Text2d>;
 
 /// 2d alias for [`TextWriter`].
-pub type TextWriter2d<'w, 's> = TextWriter<'w, 's, Text2d>;
+pub type Text2dWriter<'w, 's> = TextWriter<'w, 's, Text2d>;
 
 /// This system extracts the sprites from the 2D text components and adds them to the
 /// "render world".
 pub fn extract_text2d_sprite(
-    mut commands: Commands,
-    mut extracted_sprites: ResMut<ExtractedSprites>,
-    texture_atlases: Extract<Res<Assets<TextureAtlasLayout>>>,
-    windows: Extract<Query<&Window, With<PrimaryWindow>>>,
+    mut commands: Commands<'_, '_>,
+    mut extracted_sprites: ResMut<'_, ExtractedSprites>,
+    texture_atlases: Extract<'_, '_, Res<'_, Assets<TextureAtlasLayout>>>,
+    windows: Extract<'_, '_, Query<'_, '_, &Window, With<PrimaryWindow>>>,
     text2d_query: Extract<
-        Query<(
-            Entity,
-            &ViewVisibility,
-            &ComputedTextBlock,
-            &TextLayoutInfo,
-            &Anchor,
-            &GlobalTransform,
-        )>,
+        '_,
+        '_,
+        Query<
+            '_,
+            '_,
+            (
+                Entity,
+                &ViewVisibility,
+                &ComputedTextBlock,
+                &TextLayoutInfo,
+                &Anchor,
+                &GlobalTransform,
+            ),
+        >,
     >,
-    text_styles: Extract<Query<(&TextFont, &TextColor)>>,
+    text_styles: Extract<'_, '_, Query<'_, '_, (&TextFont, &TextColor)>>,
 ) {
     // TODO: Support window-independent scaling: https://github.com/bevyengine/bevy/issues/5621
     let scale_factor = windows
@@ -224,24 +242,28 @@ pub fn extract_text2d_sprite(
 #[allow(clippy::too_many_arguments)]
 pub fn update_text2d_layout(
     // Text items which should be reprocessed again, generally when the font hasn't loaded yet.
-    mut queue: Local<HashSet<Entity>>,
-    mut textures: ResMut<Assets<Image>>,
-    fonts: Res<Assets<Font>>,
-    windows: Query<&Window, With<PrimaryWindow>>,
-    mut scale_factor_changed: EventReader<WindowScaleFactorChanged>,
-    mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-    mut font_atlas_sets: ResMut<FontAtlasSets>,
-    mut text_pipeline: ResMut<TextPipeline>,
-    mut text_query: Query<(
-        Entity,
-        Ref<TextLayout>,
-        Ref<TextBounds>,
-        &mut TextLayoutInfo,
-        &mut ComputedTextBlock,
-    )>,
-    mut text_reader: TextReader2d,
-    mut font_system: ResMut<CosmicFontSystem>,
-    mut swash_cache: ResMut<SwashCache>,
+    mut queue: Local<'_, HashSet<Entity>>,
+    mut textures: ResMut<'_, Assets<Image>>,
+    fonts: Res<'_, Assets<Font>>,
+    windows: Query<'_, '_, &Window, With<PrimaryWindow>>,
+    mut scale_factor_changed: EventReader<'_, '_, WindowScaleFactorChanged>,
+    mut texture_atlases: ResMut<'_, Assets<TextureAtlasLayout>>,
+    mut font_atlas_sets: ResMut<'_, FontAtlasSets>,
+    mut text_pipeline: ResMut<'_, TextPipeline>,
+    mut text_query: Query<
+        '_,
+        '_,
+        (
+            Entity,
+            Ref<'_, TextLayout>,
+            Ref<'_, TextBounds>,
+            &mut TextLayoutInfo,
+            &mut ComputedTextBlock,
+        ),
+    >,
+    mut text_reader: Text2dReader<'_, '_>,
+    mut font_system: ResMut<'_, CosmicFontSystem>,
+    mut swash_cache: ResMut<'_, SwashCache>,
 ) {
     // We need to consume the entire iterator, hence `last`
     let factor_changed = scale_factor_changed.read().last().is_some();
@@ -316,8 +338,10 @@ pub fn scale_value(value: f32, factor: f32) -> f32 {
 ///
 /// Used in system set [`VisibilitySystems::CalculateBounds`](bevy_render::view::VisibilitySystems::CalculateBounds).
 pub fn calculate_bounds_text2d(
-    mut commands: Commands,
+    mut commands: Commands<'_, '_>,
     mut text_to_update_aabb: Query<
+        '_,
+        '_,
         (Entity, &TextLayoutInfo, &Anchor, Option<&mut Aabb>),
         (Changed<TextLayoutInfo>, Without<NoFrustumCulling>),
     >,
