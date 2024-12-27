@@ -42,3 +42,8 @@ macro_rules! bench {
         concat!(module_path!(), "::", $name)
     };
 }
+
+/// An array of list sizes used in benchmarks.
+///
+/// This scales logarithmically.
+pub const SIZES: [usize; 5] = [100, 316, 1000, 3162, 10_000];

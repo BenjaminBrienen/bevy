@@ -1,6 +1,6 @@
 use core::{iter, time::Duration};
 
-use benches::bench;
+use benches::{bench, SIZES};
 use bevy_reflect::{DynamicList, List};
 use criterion::{
     black_box, criterion_group, measurement::Measurement, AxisScale, BatchSize, BenchmarkGroup,
@@ -19,11 +19,6 @@ criterion_group!(
 // have so many combinations (>50) to benchmark.
 const WARM_UP_TIME: Duration = Duration::from_millis(500);
 const MEASUREMENT_TIME: Duration = Duration::from_secs(4);
-
-/// An array of list sizes used in benchmarks.
-///
-/// This scales logarithmically.
-const SIZES: [usize; 5] = [100, 316, 1000, 3162, 10000];
 
 /// Creates a [`BenchmarkGroup`] with common configuration shared by all benchmarks within this
 /// module.

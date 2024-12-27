@@ -54,7 +54,7 @@ impl BenchModify for Sparse {
     }
 }
 
-const ENTITIES_TO_BENCH_COUNT: &[u32] = &[5000, 50000];
+const ENTITIES_TO_BENCH_COUNT: &[u32] = &[5000, 50_000];
 
 type BenchGroup<'a> = criterion::BenchmarkGroup<'a, criterion::measurement::WallTime>;
 
@@ -266,7 +266,7 @@ fn none_changed_detection(criterion: &mut Criterion) {
 }
 fn insert_if_bit_enabled<const B: u16>(entity: &mut EntityWorldMut, i: u16) {
     if i & 1 << B != 0 {
-        entity.insert(Data::<B>(1.0));
+        entity.insert(Data::<B>(1.));
     }
 }
 
@@ -360,7 +360,7 @@ fn multiple_archetype_none_changed_detection(criterion: &mut Criterion) {
     group.warm_up_time(core::time::Duration::from_millis(800));
     group.measurement_time(core::time::Duration::from_secs(8));
     for archetype_count in [5, 20, 100] {
-        for entity_count in [10, 100, 1000, 10000] {
+        for entity_count in [10, 100, 1000, 10_000] {
             multiple_archetype_none_changed_detection_generic::<Table>(
                 &mut group,
                 archetype_count,

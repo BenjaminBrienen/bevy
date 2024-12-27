@@ -1,6 +1,6 @@
 use core::{fmt::Write, iter, time::Duration};
 
-use benches::bench;
+use benches::{bench, SIZES};
 use bevy_reflect::{DynamicMap, Map};
 use bevy_utils::HashMap;
 use criterion::{
@@ -20,11 +20,6 @@ criterion_group!(
 // have so many combinations (>50) to benchmark.
 const WARM_UP_TIME: Duration = Duration::from_millis(500);
 const MEASUREMENT_TIME: Duration = Duration::from_secs(4);
-
-/// An array of list sizes used in benchmarks.
-///
-/// This scales logarithmically.
-const SIZES: [usize; 5] = [100, 316, 1000, 3162, 10000];
 
 /// Creates a [`BenchmarkGroup`] with common configuration shared by all benchmarks within this
 /// module.
@@ -245,14 +240,8 @@ fn dynamic_map_get(criterion: &mut Criterion) {
             BenchmarkId::new("64_byte_keys", size),
             &size,
             |bencher, &size| {
-                let mut map = DynamicMap::default();
-                let mut keys = Vec::with_capacity(size);
-                for i in 0..size as u64 {
-                    let key = u64_to_n_byte_key(i, 64);
-                    map.insert(key.clone(), i);
-                    keys.push(key);
-                }
-
+                let keys: Vec<_> = (0..size as u64).map(|i| u64_to_n_byte_key(i, 64)).collect();
+                let map = DynamicMap::from_iter(keys.clone().into_iter().enumerate());
                 bencher.iter(|| {
                     for key in keys.iter().take(size) {
                         let key = black_box(key);
@@ -293,11 +282,7 @@ fn dynamic_map_insert(criterion: &mut Criterion) {
             BenchmarkId::new("64_byte_keys", size),
             &size,
             |bencher, &size| {
-                let mut keys = Vec::with_capacity(size);
-                for i in 0..size {
-                    let key = u64_to_n_byte_key(i as u64, 64);
-                    keys.push(key);
-                }
+                let keys: Vec<_> = (0..size).map(|i| u64_to_n_byte_key(i as u64, 64)).collect();
 
                 bencher.iter_batched(
                     || (DynamicMap::default(), keys.clone()),
