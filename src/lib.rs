@@ -59,3 +59,119 @@ pub use bevy_internal::*;
     reason = "This causes Bevy to be compiled as a dylib when using dynamic linking and therefore cannot be removed or changed without affecting dynamic linking."
 )]
 use bevy_dylib;
+
+#[cfg(feature = "std")]
+extern crate std;
+
+// Load the crate’s rustdoc JSON before running this test
+// ```bash
+// cargo +nightly rustdoc -- --document-private-items
+// ```
+#[test]
+fn ensure_unique_public_paths() {
+    #[cfg(feature = "std")]
+    {
+        use std::collections::HashMap;
+        use std::eprint;
+        use std::format;
+        use std::fs;
+        use std::io::Write;
+        use std::path::Path;
+        use std::string::ToString;
+        use std::{string::String, vec::Vec};
+
+        let doc_root = "target/doc/bevy";
+
+        let mut items: HashMap<String, Vec<String>> = HashMap::new();
+
+        fn visit_dir(dir: &Path, items: &mut HashMap<String, Vec<String>>) {
+            if dir.is_dir() {
+                for entry in fs::read_dir(dir).expect("Failed to read directory") {
+                    let entry = entry.expect("Failed to read entry");
+                    let path = entry.path();
+
+                    if path.is_dir() {
+                        visit_dir(&path, items);
+                        continue;
+                    }
+
+                    let Some(ext) = path.extension() else {
+                        continue;
+                    };
+                    if ext != "html" {
+                        continue;
+                    }
+
+                    let file_name = path
+                        .file_name()
+                        .expect("path has a file name")
+                        .to_str()
+                        .expect("file name is not valid UTF-8");
+
+                    let parts: Vec<&str> = file_name.split('.').collect();
+                    if parts.len() != 3 {
+                        // Skip files that don't follow type.name.html format
+                        continue;
+                    }
+
+                    let item_type = parts[0]; // struct, enum, fn, etc.
+                    let item_name = parts[1]; // actual name
+
+                    // Compute Rust module path
+                    let mut components: Vec<String> = path
+                        .strip_prefix("target/doc")
+                        .unwrap()
+                        .components()
+                        .map(|c| c.as_os_str().to_string_lossy().to_string())
+                        .collect();
+                    components.pop(); // remove file name
+                    let rust_path = format!("{}::{}", components.join("::"), item_name);
+
+                    // Skip items in bevy::prelude or bevy::<crate>::prelude
+                    if rust_path.starts_with("bevy::prelude")
+                        || rust_path.starts_with("bevy::") && rust_path.contains("::prelude::")
+                    {
+                        continue;
+                    }
+
+                    // Use "type.name" as the key
+                    items
+                        .entry(format!("{}.{}", item_type, item_name))
+                        .or_default()
+                        .push(rust_path);
+                }
+            }
+        }
+
+        visit_dir(Path::new(doc_root), &mut items);
+
+        // Collect duplicates
+        let duplicates: Vec<_> = items
+            .iter()
+            .filter(|(_, paths)| paths.len() > 1)
+            .map(|(item, paths)| (item, paths.clone()))
+            .collect();
+
+        if !duplicates.is_empty() {
+            let mut buffer = String::new();
+            buffer.push_str("Found duplicate rustdoc items:\n");
+
+            for (item, paths) in duplicates {
+                let parts: Vec<&str> = item.split('.').collect();
+                let item_type = parts[0];
+                let item_name = parts[1];
+                buffer.push_str(&format!("{} {}\n", item_type, item_name));
+                for path in paths {
+                    buffer.push_str(&format!("    {}\n", path));
+                }
+            }
+
+            eprint!("{buffer}");
+            let mut file =
+                fs::File::create("duplicates.txt").expect("Failed to create duplicates.txt");
+            file.write_all(buffer.as_bytes())
+                .expect("Failed to write to duplicates.txt");
+            panic!("Rustdoc output contains duplicate items!");
+        }
+    }
+}
