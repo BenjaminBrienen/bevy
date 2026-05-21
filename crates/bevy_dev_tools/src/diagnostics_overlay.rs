@@ -16,18 +16,17 @@ use bevy_text::prelude::*;
 use bevy_time::common_conditions::on_timer;
 use bevy_ui::prelude::*;
 
-/// Initial offset from the top left corner of the window
-/// for the diagnostics overlay
+/// Initial offset from the top left corner of the window for the diagnostics overlay.
 const INITIAL_OFFSET: Val = Val::Px(32.);
-/// Alpha value for [`BackgroundColor`] of the overlay
+/// Alpha value for [`BackgroundColor`] of the overlay.
 const BACKGROUND_COLOR_ALPHA: f32 = 0.75;
-/// Row and column gap for the diagnostics overlay
+/// Row and column gap for the diagnostics overlay.
 const ROW_COLUMN_GAP: Val = Val::Px(4.);
-/// Padding for cels of the diagnostics overlay
+/// Padding for cels of the diagnostics overlay.
 const DEFAULT_PADDING: UiRect = UiRect::all(Val::Px(4.));
-/// Initial Z-index for the [`DiagnosticsOverlayPlane`]
+/// Initial Z-index for the [`DiagnosticsOverlayPlane`].
 pub const INITIAL_DIAGNOSTICS_OVERLAY_PLANE_Z_INDEX: GlobalZIndex = GlobalZIndex(1_000_000);
-/// Alias to shorten the name
+/// Alias to shorten the name.
 type StandardMaterialAllocator = MaterialAllocatorDiagnosticPlugin<StandardMaterial>;
 
 /// Diagnostics overlay displays on a draggable and collapsible window
@@ -68,7 +67,7 @@ type StandardMaterialAllocator = MaterialAllocatorDiagnosticPlugin<StandardMater
 /// A [`DiagnosticsOverlay`] entity will be managed by [`DiagnosticsOverlayPlugin`],
 /// and be added as a child of the [`DiagnosticsOverlayPlane`].
 ///
-/// If any value is showing as `Missing`, means that the [`DiagnosticPath`] is not registered,
+/// If any value is showing as `Missing`, it means that the [`DiagnosticPath`] is not registered,
 /// so make sure that the plugin that writes to it is properly set up.
 #[derive(Component)]
 pub struct DiagnosticsOverlay {
@@ -79,7 +78,7 @@ pub struct DiagnosticsOverlay {
 }
 
 impl DiagnosticsOverlay {
-    /// Creates a new instance of a [`DiagnosticsOverlay`]
+    /// Creates a new instance of a [`DiagnosticsOverlay`].
     pub fn new(
         title: impl Into<Cow<'static, str>>,
         diagnostic_paths: Vec<DiagnosticsOverlayItem>,
@@ -90,7 +89,7 @@ impl DiagnosticsOverlay {
         }
     }
 
-    /// Create a [`DiagnosticsOverlay`] with the diagnostcs from [`FrameTimeDiagnosticsPlugin`]
+    /// Create a [`DiagnosticsOverlay`] with the diagnostcs from [`FrameTimeDiagnosticsPlugin`].
     pub fn fps() -> Self {
         Self {
             title: Cow::Owned("Fps".to_owned()),
@@ -108,7 +107,7 @@ impl DiagnosticsOverlay {
 
     /// Create a [`DiagnosticsOverlay`] with the diagnostics from
     /// [`MaterialAllocatorDiagnosticPlugin`] of [`StandardMaterial`] and
-    /// [`MeshAllocatorDiagnosticPlugin`]
+    /// [`MeshAllocatorDiagnosticPlugin`].
     pub fn mesh_and_standard_material() -> Self {
         Self {
             title: Cow::Owned("Mesh and standard materials".to_owned()),
@@ -148,8 +147,7 @@ impl DiagnosticsOverlay {
     }
 }
 
-/// Marker for the UI root that will hold all of the [`DiagnosticsOverlay`]
-/// entities.
+/// Marker for the UI root that will hold all of the [`DiagnosticsOverlay`] entities.
 ///
 /// Initially the [`DiagnosticsOverlayPlane`] will be positioned at the
 /// [`GlobalZIndex`] of [`INITIAL_DIAGNOSTICS_OVERLAY_PLANE_Z_INDEX`].
@@ -160,8 +158,7 @@ pub struct DiagnosticsOverlayPlane;
 
 /// An item to be displayed on the overlay.
 ///
-/// Items built using `From<DiagnosticPath>` will use
-/// [`DiagnosticsOverlayStatistic::Smoothed`].
+/// Items built using `From<DiagnosticPath>` will use [`DiagnosticsOverlayStatistic::Smoothed`].
 pub struct DiagnosticsOverlayItem {
     /// The statistic of the diagnostic to display
     pub statistic: DiagnosticsOverlayStatistic,
@@ -186,7 +183,7 @@ impl From<DiagnosticPath> for DiagnosticsOverlayItem {
 /// The statistic to use when displaying a diagnostic
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum DiagnosticsOverlayStatistic {
-    /// The most recent value of on the diagnostic store
+    /// The most recent value of on the diagnostic store.
     Value,
     /// The average of a window of values in the diagnostic store.
     Average,
@@ -210,7 +207,7 @@ impl DiagnosticsOverlayStatistic {
 /// System set for the systems of the [`DiagnosticsOverlayPlugin`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub enum DiagnosticsOverlaySystems {
-    /// Rebuild the contents of the [`DiagnosticsOverlay`] entities
+    /// Rebuild the contents of the [`DiagnosticsOverlay`] entities.
     Rebuild,
 }
 
@@ -237,8 +234,7 @@ impl Plugin for DiagnosticsOverlayPlugin {
     }
 }
 
-/// Builds the Ui plane where the [`DiagnosticsOverlay`] entities
-/// will reside.
+/// Builds the Ui plane where the [`DiagnosticsOverlay`] entities will reside.
 fn build_plane(mut commands: Commands) {
     commands.spawn((
         DiagnosticsOverlayPlane,
@@ -251,11 +247,11 @@ fn build_plane(mut commands: Commands) {
     ));
 }
 
-/// Header of the overlay
+/// Header of the overlay.
 #[derive(Component)]
 struct DiagnosticsOverlayHeader;
 
-/// Section of the overlay that will have the diagnostics
+/// Section of the overlay that will have the diagnostics.
 #[derive(Component)]
 struct DiagnosticsOverlayContents;
 
