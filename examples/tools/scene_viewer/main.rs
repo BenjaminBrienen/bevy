@@ -14,6 +14,7 @@ use bevy::{
     camera::primitives::{Aabb, Sphere},
     camera_controller::free_camera::{FreeCamera, FreeCameraPlugin},
     core_pipeline::prepass::{DeferredPrepass, DepthPrepass},
+    dev_tools::diagnostics_overlay::{DiagnosticsOverlay, DiagnosticsOverlayPlugin},
     dev_tools::infinite_grid::{InfiniteGrid, InfiniteGridPlugin},
     gltf::{convert_coordinates::GltfConvertCoordinates, GltfPlugin},
     pbr::DefaultOpaqueRendererMethod,
@@ -109,6 +110,7 @@ fn main() {
         SceneViewerPlugin,
         MorphViewerPlugin,
         InfiniteGridPlugin,
+        DiagnosticsOverlayPlugin,
     ))
     .insert_resource(args)
     .add_systems(Startup, setup)
@@ -149,6 +151,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, args: Res<Args>
     }
 
     commands.insert_resource(SceneHandle::new(asset_server.load(file_path), scene_index));
+    commands.spawn(DiagnosticsOverlay::fps());
+    commands.spawn(DiagnosticsOverlay::mesh_and_standard_material());
 }
 
 fn setup_scene_after_load(
