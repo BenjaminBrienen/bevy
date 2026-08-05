@@ -5,6 +5,23 @@ use bevy_reflect::TypePath;
 use bevy_utils::define_atomic_id;
 use thiserror::Error;
 
+/// Cancels out `..` in paths
+pub fn normalize_components(components: impl IntoIterator<Item = String>) -> Vec<String> {
+    let mut normalized = Vec::new();
+
+    for component in components {
+        match component.as_str() {
+            "" | "." => {}
+            ".." => {
+                normalized.pop();
+            }
+            _ => normalized.push(component),
+        }
+    }
+
+    normalized
+}
+
 fn scan_wesl_imports(
     source: &str,
     self_module_path: &wesl::syntax::ModulePath,
@@ -21,7 +38,8 @@ fn scan_wesl_imports(
             }
             ImportContent::Collection(collection) => {
                 for import in collection {
-                    let path = path.clone().join(import.path.iter().cloned());
+                    let mut path = path.clone().join(import.path.iter().cloned());
+                    path.components = normalize_components(path.components);
                     leaves(&import.content, path, out);
                 }
             }
@@ -36,7 +54,8 @@ fn scan_wesl_imports(
     for statement in &translation_unit.imports {
         match &statement.path {
             Some(import_path) => {
-                let path = self_module_path.join_path(import_path);
+                let mut path = self_module_path.join_path(import_path);
+                path.components = normalize_components(path.components);
                 leaves(&statement.content, path, &mut paths);
             }
             None => {
@@ -44,8 +63,10 @@ fn scan_wesl_imports(
                     for import in collection {
                         let mut components = import.path.iter().cloned();
                         if let Some(package) = components.next() {
-                            let path =
-                                ModulePath::new(PathOrigin::Package(package), components.collect());
+                            let path = ModulePath::new(
+                                PathOrigin::Package(package),
+                                normalize_components(components.collect::<Vec<_>>()),
+                            );
                             leaves(&import.content, path, &mut paths);
                         }
                     }

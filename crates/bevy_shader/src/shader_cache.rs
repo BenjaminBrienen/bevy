@@ -21,13 +21,21 @@ pub(crate) fn wesl_module_path(import_path: &ShaderImport) -> Option<wesl::synta
                 components,
             })
         }
+
         // `ModulePath::from_path` would strip anything after a `.` as an extension.
         ShaderImport::AssetPath(path) => {
-            let components: Vec<String> = path
-                .split('/')
-                .filter(|component| !component.is_empty())
-                .map(str::to_string)
-                .collect();
+            let mut components = Vec::new();
+
+            for component in path.split('/') {
+                match component {
+                    "" | "." => {}
+                    ".." => {
+                        components.pop();
+                    }
+                    component => components.push(component.to_string()),
+                }
+            }
+
             (!components.is_empty()).then_some(wesl::syntax::ModulePath {
                 origin: wesl::syntax::PathOrigin::Absolute,
                 components,
@@ -304,7 +312,6 @@ impl<ShaderModule, RenderDevice> ShaderCache<ShaderModule, RenderDevice> {
                                     ShaderCacheError::ProcessShaderError(error.to_string())
                                 }
                             })?;
-
                             for used in &compiled.modules {
                                 let used = match &used.origin {
                                     wesl::syntax::PathOrigin::Package(pkg) if pkg.contains('/') => {
@@ -312,7 +319,9 @@ impl<ShaderModule, RenderDevice> ShaderCache<ShaderModule, RenderDevice> {
                                             origin: wesl::syntax::PathOrigin::Package(
                                                 pkg.rsplit('/').next().unwrap().to_string(),
                                             ),
-                                            components: used.components.clone(),
+                                            components: normalize_components(
+                                                used.components.clone(),
+                                            ),
                                         })
                                     }
                                     _ => Cow::Borrowed(used),
@@ -511,10 +520,13 @@ impl<'a> wesl::Resolver for ShaderResolver<'a> {
                     origin: wesl::syntax::PathOrigin::Package(
                         pkg.rsplit('/').next().unwrap().to_string(),
                     ),
-                    components: module_path.components.clone(),
+                    components: normalize_components(module_path.components.clone()),
                 }
             }
-            _ => module_path.clone(),
+            _ => wesl::syntax::ModulePath {
+                origin: module_path.origin.clone(),
+                components: normalize_components(module_path.components.clone()),
+            },
         }
     }
 
