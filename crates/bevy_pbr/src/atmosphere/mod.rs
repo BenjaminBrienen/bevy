@@ -98,10 +98,10 @@ pub struct AtmospherePlugin;
 
 impl Plugin for AtmospherePlugin {
     fn build(&self, app: &mut App) {
-        load_shader_library!(app, "types.wesl");
-        load_shader_library!(app, "functions.wesl");
-        load_shader_library!(app, "bruneton_functions.wesl");
-        load_shader_library!(app, "bindings.wesl");
+        load_shader_library!(app, "../../shaders/atmosphere/types.wesl");
+        load_shader_library!(app, "../../shaders/atmosphere/functions.wesl");
+        load_shader_library!(app, "../../shaders/atmosphere/bruneton_functions.wesl");
+        load_shader_library!(app, "../../shaders/atmosphere/bindings.wesl");
 
         embedded_asset!(app, "transmittance_lut.wesl");
         embedded_asset!(app, "multiscattering_lut.wesl");

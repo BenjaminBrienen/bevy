@@ -180,29 +180,29 @@ pub struct DfgLut {
 
 impl Plugin for PbrPlugin {
     fn build(&self, app: &mut App) {
-        load_shader_library!(app, "render/pbr_types.wesl");
-        load_shader_library!(app, "render/pbr_bindings.wesl");
-        load_shader_library!(app, "cluster.wesl");
-        load_shader_library!(app, "lightmap.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_types.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_bindings.wesl");
+        load_shader_library!(app, "../shaders/cluster.wesl");
+        load_shader_library!(app, "../shaders/lightmap.wesl");
         load_shader_library!(app, "ssr.wesl");
-        load_shader_library!(app, "transmission.wesl");
-        load_shader_library!(app, "light_probe.wesl");
-        load_shader_library!(app, "render/utils.wesl");
-        load_shader_library!(app, "render/clustered_forward.wesl");
-        load_shader_library!(app, "render/pbr_lighting.wesl");
-        load_shader_library!(app, "render/shadows.wesl");
-        load_shader_library!(app, "deferred/types.wesl");
-        load_shader_library!(app, "deferred/functions.wesl");
-        load_shader_library!(app, "render/shadow_sampling.wesl");
-        load_shader_library!(app, "render/pbr_functions.wesl");
-        load_shader_library!(app, "render/rgb9e5.wesl");
-        load_shader_library!(app, "render/pbr_ambient.wesl");
-        load_shader_library!(app, "render/pbr_fragment.wesl");
+        load_shader_library!(app, "../shaders/transmission.wesl");
+        load_shader_library!(app, "../shaders/light_probe.wesl");
+        load_shader_library!(app, "../shaders/render/utils.wesl");
+        load_shader_library!(app, "../shaders/render/clustered_forward.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_lighting.wesl");
+        load_shader_library!(app, "../shaders/render/shadows.wesl");
+        load_shader_library!(app, "../shaders/deferred/types.wesl");
+        load_shader_library!(app, "../shaders/deferred/functions.wesl");
+        load_shader_library!(app, "../shaders/render/shadow_sampling.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_functions.wesl");
+        load_shader_library!(app, "../shaders/render/rgb9e5.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_ambient.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_fragment.wesl");
         load_shader_library!(app, "render/pbr.wesl");
-        load_shader_library!(app, "render/pbr_prepass_functions.wesl");
+        load_shader_library!(app, "../shaders/render/pbr_prepass_functions.wesl");
         load_shader_library!(app, "render/pbr_prepass.wesl");
-        load_shader_library!(app, "render/parallax_mapping.wesl");
-        load_shader_library!(app, "render/view_transformations.wesl");
+        load_shader_library!(app, "../shaders/render/parallax_mapping.wesl");
+        load_shader_library!(app, "../shaders/render/view_transformations.wesl");
 
         app.register_asset_reflect::<StandardMaterial>()
             .init_resource::<DefaultOpaqueRendererMethod>()

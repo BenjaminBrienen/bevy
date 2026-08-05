@@ -148,27 +148,32 @@ pub struct MeshPipelineSystems;
 
 impl Plugin for MeshRenderPlugin {
     fn build(&self, app: &mut App) {
-        load_shader_library!(app, "forward_io.wesl");
-        load_shader_library!(app, "mesh_view_types.wesl", |settings| *settings =
-            ShaderSettings {
-                shader_defs: vec![
-                    ShaderDefVal::UInt(
-                        "MAX_DIRECTIONAL_LIGHTS".into(),
-                        MAX_DIRECTIONAL_LIGHTS as u32
-                    ),
-                    ShaderDefVal::UInt(
-                        "MAX_CASCADES_PER_LIGHT".into(),
-                        MAX_CASCADES_PER_LIGHT as u32,
-                    ),
-                    ShaderDefVal::UInt("MAX_RECT_LIGHTS".into(), MAX_RECT_LIGHTS as u32,),
-                ],
-            });
-        load_shader_library!(app, "mesh_view_bindings.wesl");
-        load_shader_library!(app, "mesh_types.wesl");
-        load_shader_library!(app, "mesh_functions.wesl");
-        load_shader_library!(app, "skinning.wesl");
-        load_shader_library!(app, "morph.wesl");
-        load_shader_library!(app, "occlusion_culling.wesl");
+        load_shader_library!(app, "../../shaders/render/forward_io.wesl");
+        load_shader_library!(
+            app,
+            "../../shaders/render/mesh_view_types.wesl",
+            |settings| {
+                *settings = ShaderSettings {
+                    shader_defs: vec![
+                        ShaderDefVal::UInt(
+                            "MAX_DIRECTIONAL_LIGHTS".into(),
+                            MAX_DIRECTIONAL_LIGHTS as u32,
+                        ),
+                        ShaderDefVal::UInt(
+                            "MAX_CASCADES_PER_LIGHT".into(),
+                            MAX_CASCADES_PER_LIGHT as u32,
+                        ),
+                        ShaderDefVal::UInt("MAX_RECT_LIGHTS".into(), MAX_RECT_LIGHTS as u32),
+                    ],
+                }
+            }
+        );
+        load_shader_library!(app, "../../shaders/render/mesh_view_bindings.wesl");
+        load_shader_library!(app, "../../shaders/render/mesh_types.wesl");
+        load_shader_library!(app, "../../shaders/render/mesh_functions.wesl");
+        load_shader_library!(app, "../../shaders/render/skinning.wesl");
+        load_shader_library!(app, "../../shaders/render/morph.wesl");
+        load_shader_library!(app, "../../shaders/render/occlusion_culling.wesl");
 
         embedded_asset!(app, "mesh.wesl");
 
@@ -328,10 +333,15 @@ impl Plugin for MeshRenderPlugin {
 
         // Load the mesh_bindings shader module here as it depends on runtime information about
         // whether storage buffers are supported, or the maximum uniform buffer binding size.
-        load_shader_library!(app, "mesh_bindings.wesl", move |settings| *settings =
-            ShaderSettings {
-                shader_defs: mesh_bindings_shader_defs.clone(),
-            });
+        load_shader_library!(
+            app,
+            "../../shaders/render/mesh_bindings.wesl",
+            move |settings| {
+                *settings = ShaderSettings {
+                    shader_defs: mesh_bindings_shader_defs.clone(),
+                }
+            }
+        );
     }
 }
 

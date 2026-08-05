@@ -372,8 +372,8 @@ pub trait LightProbeComponent: Send + Sync + Component + Sized {
 
 impl Plugin for LightProbePlugin {
     fn build(&self, app: &mut App) {
-        load_shader_library!(app, "environment_map.wesl");
-        load_shader_library!(app, "irradiance_volume.wesl");
+        load_shader_library!(app, "../../shaders/light_probe/environment_map.wesl");
+        load_shader_library!(app, "../../shaders/light_probe/irradiance_volume.wesl");
 
         app.add_plugins((
             EnvironmentMapGenerationPlugin,

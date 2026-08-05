@@ -159,7 +159,7 @@ impl Default for DecalsBuffer {
 
 impl Plugin for ClusteredDecalPlugin {
     fn build(&self, app: &mut App) {
-        load_shader_library!(app, "clustered.wesl");
+        load_shader_library!(app, "../../shaders/decal/clustered.wesl");
 
         app.add_plugins(SyncComponentPlugin::<ClusteredDecal, RenderApp, Self>::default());
 

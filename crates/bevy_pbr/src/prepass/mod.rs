@@ -78,9 +78,9 @@ impl Plugin for PrepassPipelinePlugin {
     fn build(&self, app: &mut App) {
         embedded_asset!(app, "prepass.wesl");
 
-        load_shader_library!(app, "bindings.wesl");
-        load_shader_library!(app, "utils.wesl");
-        load_shader_library!(app, "io.wesl");
+        load_shader_library!(app, "../../shaders/prepass/bindings.wesl");
+        load_shader_library!(app, "../../shaders/prepass/utils.wesl");
+        load_shader_library!(app, "../../shaders/prepass/io.wesl");
 
         let Some(render_app) = app.get_sub_app_mut(RenderApp) else {
             return;

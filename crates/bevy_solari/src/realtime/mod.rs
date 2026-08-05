@@ -34,12 +34,12 @@ pub struct SolariLightingPlugin;
 
 impl Plugin for SolariLightingPlugin {
     fn build(&self, app: &mut App) {
-        load_shader_library!(app, "gbuffer_utils.wesl");
-        load_shader_library!(app, "bindings.wesl");
+        load_shader_library!(app, "../../shaders/realtime/gbuffer_utils.wesl");
+        load_shader_library!(app, "../../shaders/realtime/bindings.wesl");
         load_shader_library!(app, "presample_light_tiles.wesl");
-        load_shader_library!(app, "initial_path.wesl");
+        load_shader_library!(app, "../../shaders/realtime/initial_path.wesl");
         embedded_asset!(app, "restir.wesl");
-        load_shader_library!(app, "world_cache_query.wesl");
+        load_shader_library!(app, "../../shaders/realtime/world_cache_query.wesl");
         embedded_asset!(app, "world_cache_compact.wesl");
         embedded_asset!(app, "world_cache_update.wesl");
 

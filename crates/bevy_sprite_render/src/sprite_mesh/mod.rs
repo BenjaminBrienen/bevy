@@ -25,9 +25,9 @@ pub struct SpriteMeshPlugin;
 
 impl Plugin for SpriteMeshPlugin {
     fn build(&self, app: &mut bevy_app::App) {
-        load_shader_library!(app, "bindings.wesl");
-        load_shader_library!(app, "functions.wesl");
-        load_shader_library!(app, "types.wesl");
+        load_shader_library!(app, "../../shaders/sprite_mesh/bindings.wesl");
+        load_shader_library!(app, "../../shaders/sprite_mesh/functions.wesl");
+        load_shader_library!(app, "../../shaders/sprite_mesh/types.wesl");
 
         app.add_plugins(SpriteMaterialPlugin);
 
