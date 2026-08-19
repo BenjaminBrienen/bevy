@@ -1,0 +1,5 @@
+edition = "2026_pre"
+root = "./src"
+
+[dependencies]
+bevy_core_pipeline = { path = "../bevy_core_pipeline" }

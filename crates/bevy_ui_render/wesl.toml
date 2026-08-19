@@ -1,0 +1,6 @@
+edition = "2026_pre"
+root = "./src"
+
+[dependencies]
+bevy_render = { path = "../bevy_render" }
+constants = { path = "../../constants" }
