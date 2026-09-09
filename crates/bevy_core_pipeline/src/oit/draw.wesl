@@ -1,4 +1,11 @@
-import bevy_pbr::render::mesh_view_bindings::{view, oit_nodes_capacity, oit_nodes, oit_heads, oit_atomic_counter, oit_settings};
+import bevy_pbr::render::mesh_view_bindings::{
+    oit_atomic_counter,
+    oit_heads,
+    oit_nodes,
+    oit_nodes_capacity,
+    oit_settings,
+    view
+};
 import bevy_pbr::render::mesh_view_types::OitFragmentNode;
 import bevy_pbr::prepass::utils as prepass_utils;
 
