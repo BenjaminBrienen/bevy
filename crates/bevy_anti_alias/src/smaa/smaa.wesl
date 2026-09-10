@@ -842,9 +842,9 @@ fn search_x_left(in_tex_coord: vec2<f32>, end: f32) -> f32 {
      * which edges are active from the four fetched ones.
      */
     var e = vec2(0.0, 1.0);
-    while (tex_coord.x > end &&
-           e.g > 0.8281 &&  // Is there some edge not activated?
-           e.r == 0.0) {    // Or is there a crossing edge that breaks the line?
+    while tex_coord.x > end && e.g > 0.8281 && // Is there some edge not activated?
+        e.r == 0.0 {
+        // Or is there a crossing edge that breaks the line?
         e = textureSampleLevel(edges_texture, edges_sampler, tex_coord, 0.0).rg;
         tex_coord += -vec2(2.0, 0.0) * smaa_info.rt_metrics.xy;
     }
@@ -857,9 +857,9 @@ fn search_x_right(in_tex_coord: vec2<f32>, end: f32) -> f32 {
     var tex_coord = in_tex_coord;
 
     var e = vec2(0.0, 1.0);
-    while (tex_coord.x < end &&
-           e.g > 0.8281 &&  // Is there some edge not activated?
-           e.r == 0.0) {    // Or is there a crossing edge that breaks the line?
+    while tex_coord.x < end && e.g > 0.8281 && // Is there some edge not activated?
+        e.r == 0.0 {
+        // Or is there a crossing edge that breaks the line?
         e = textureSampleLevel(edges_texture, edges_sampler, tex_coord, 0.0).rg;
         tex_coord += vec2(2.0, 0.0) * smaa_info.rt_metrics.xy;
     }
@@ -872,9 +872,9 @@ fn search_y_up(in_tex_coord: vec2<f32>, end: f32) -> f32 {
     var tex_coord = in_tex_coord;
 
     var e = vec2(1.0, 0.0);
-    while (tex_coord.y > end &&
-           e.r > 0.8281 &&  // Is there some edge not activated?
-           e.g == 0.0) {    // Or is there a crossing edge that breaks the line?
+    while tex_coord.y > end && e.r > 0.8281 && // Is there some edge not activated?
+        e.g == 0.0 {
+        // Or is there a crossing edge that breaks the line?
         e = textureSampleLevel(edges_texture, edges_sampler, tex_coord, 0.0).rg;
         tex_coord += -vec2(0.0, 2.0) * smaa_info.rt_metrics.xy;
     }
@@ -887,9 +887,9 @@ fn search_y_down(in_tex_coord: vec2<f32>, end: f32) -> f32 {
     var tex_coord = in_tex_coord;
 
     var e = vec2(1.0, 0.0);
-    while (tex_coord.y < end &&
-           e.r > 0.8281 &&  // Is there some edge not activated?
-           e.g == 0.0) {    // Or is there a crossing edge that breaks the line?
+    while tex_coord.y < end && e.r > 0.8281 && // Is there some edge not activated?
+        e.g == 0.0 {
+        // Or is there a crossing edge that breaks the line?
         e = textureSampleLevel(edges_texture, edges_sampler, tex_coord, 0.0).rg;
         tex_coord += vec2(0.0, 2.0) * smaa_info.rt_metrics.xy;
     }
@@ -929,7 +929,8 @@ fn detect_horizontal_corner_pattern(
         let left_right = step(d.xy, d.yx);
         var rounding = (1.0 - SMAA_CORNER_ROUNDING_NORM) * left_right;
 
-        rounding /= left_right.x + left_right.y; // Reduce blending for pixels in the center of a line.
+        rounding /= left_right.x
+            + left_right.y; // Reduce blending for pixels in the center of a line.
 
         var factor = vec2(1.0, 1.0);
         factor.x -= rounding.x
@@ -1030,8 +1031,8 @@ fn blending_weight_calculation_fragment_main(
         let sqrt_d = sqrt(d);
 
         // Fetch the right crossing edges:
-        let e2 = textureSampleLevel(
-            edges_texture, edges_sampler, coords.zy, 0.0, vec2<i32>(1, 0)).r;
+        let e2 = textureSampleLevel(edges_texture, edges_sampler, coords.zy, 0.0, vec2<i32>(1, 0))
+                .r;
 
         // Ok, we know how this pattern looks like, now it is time for getting
         // the actual area:
@@ -1068,8 +1069,8 @@ fn blending_weight_calculation_fragment_main(
         let sqrt_d = sqrt(d);
 
         // Fetch the bottom crossing edges:
-        let e2 = textureSampleLevel(
-            edges_texture, edges_sampler, coords.xz, 0.0, vec2<i32>(0, 1)).g;
+        let e2 = textureSampleLevel(edges_texture, edges_sampler, coords.xz, 0.0, vec2<i32>(0, 1))
+                .g;
 
         // Get the area for this direction:
         weights = vec4(weights.rg, area(sqrt_d, e1, e2, subsample_indices.x));

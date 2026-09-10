@@ -119,11 +119,10 @@ fn fragment(in: FullscreenVertexOutput) -> FragmentOutput {
         );
 
     var grid_color = vec4(
-        axis_color * alpha.x 
-            + grid_settings.major_line_col.rgb * alpha.y 
+            axis_color * alpha.x + grid_settings.major_line_col.rgb * alpha.y
             + grid_settings.minor_line_col.rgb * alpha.z,
-        max(a_0 * alpha_fadeout, 0.0),
-    );
+            max(a_0 * alpha_fadeout, 0.0),
+        );
     out.color = grid_color;
 
     return out;

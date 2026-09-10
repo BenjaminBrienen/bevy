@@ -138,7 +138,8 @@ fn sample_multiscattering_dir(
         let local_up = get_local_up(r, t_max, ray_dir);
         let mu_light = dot(light_dir, local_up);
         let transmittance_to_light = sample_transmittance_lut(0.0, mu_light);
-        let ground_luminance = transmittance_to_light * transmittance_to_ground * max(mu_light, 0.0) * atmosphere.ground_albedo;
+        let ground_luminance = transmittance_to_light * transmittance_to_ground * max(mu_light, 0.0)
+            * atmosphere.ground_albedo;
         l_2 += ground_luminance;
     }
 

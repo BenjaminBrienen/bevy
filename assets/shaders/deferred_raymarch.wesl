@@ -44,11 +44,9 @@ fn map(p: vec3<f32>) -> f32 {
 fn sdf_normal(p: vec3<f32>) -> vec3<f32> {
     let e = vec2<f32>(1.0, -1.0) * 0.0005;
     return normalize(
-        e.xyy * map(p + e.xyy) +
-        e.yyx * map(p + e.yyx) +
-        e.yxy * map(p + e.yxy) +
-        e.xxx * map(p + e.xxx)
-    );
+            e.xyy * map(p + e.xyy) + e.yyx * map(p + e.yyx) + e.yxy * map(p + e.yxy)
+            + e.xxx * map(p + e.xxx),
+        );
 }
 
 fn raymarch(ray_origin: vec3<f32>, ray_dir: vec3<f32>) -> f32 {
@@ -121,9 +119,8 @@ fn fragment(in: FullscreenVertexOutput) -> GBufferOutput {
 
     // Per-pixel base color
     let field = gyroid_field(world_pos);
-    let color = 0.5 + 0.5 * cos(
-        6.2831 * (field * 0.4 + globals.time * 0.05) + vec3<f32>(0.0, 0.8, 1.6)
-    );
+    let color = 0.5
+        + 0.5 * cos(6.2831 * (field * 0.4 + globals.time * 0.05) + vec3<f32>(0.0, 0.8, 1.6));
     pbr_input.material.base_color = vec4<f32>(color, 1.0);
     pbr_input.material.metallic = 0.7;
     pbr_input.material.perceptual_roughness = 0.25;

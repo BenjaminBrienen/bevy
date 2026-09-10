@@ -88,7 +88,9 @@ fn vertex(vertex: VertexInput) -> VertexOutput {
         // Offset to compensate for moved clip positions. If removed dots on lines will slide when position a is ofscreen.
         let clipped_offset = length(position_a.xyz - vertex.position_a);
 
-        uv = (clipped_offset + position.y * world_distance) * resolution.y / near_clipping_plane_height / line_gizmo.line_width;
+        uv =
+            (clipped_offset + position.y * world_distance) * resolution.y
+            / near_clipping_plane_height / line_gizmo.line_width;
     } @else {
         // Get the distance of b to the camera along camera axes
         let camera_b = view.view_from_clip * clip_b;

@@ -67,7 +67,8 @@ fn somewhat_boring_display_transform(col: vec3<f32>) -> vec3<f32> {
     let desat_col = mix(boring_color.rgb, ycbcr.xxx, desat);
 
     let tm_luma = tonemap_curve(ycbcr.x);
-    let tm0 = boring_color.rgb * max(0.0, tm_luma / max(1e-5, tonemapping_luminance(boring_color.rgb)));
+    let tm0 = boring_color.rgb
+        * max(0.0, tm_luma / max(1e-5, tonemapping_luminance(boring_color.rgb)));
     let final_mult = 0.97;
     let tm1 = tonemap_curve3_(desat_col);
 
@@ -85,7 +86,10 @@ fn somewhat_boring_display_transform(col: vec3<f32>) -> vec3<f32> {
 const TONY_MC_MAPFACE_LUT_DIMS: f32 = 48.0;
 
 fn sample_tony_mc_mapface_lut(stimulus: vec3<f32>) -> vec3<f32> {
-    var uv = (stimulus / (stimulus + 1.0)) * (f32(TONY_MC_MAPFACE_LUT_DIMS - 1.0) / f32(TONY_MC_MAPFACE_LUT_DIMS)) + 0.5 / f32(TONY_MC_MAPFACE_LUT_DIMS);
+    var uv =
+        (stimulus / (stimulus + 1.0))
+        * (f32(TONY_MC_MAPFACE_LUT_DIMS - 1.0) / f32(TONY_MC_MAPFACE_LUT_DIMS))
+        + 0.5 / f32(TONY_MC_MAPFACE_LUT_DIMS);
     return sample_current_lut(saturate(uv)).rgb;
 }
 

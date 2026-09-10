@@ -257,9 +257,11 @@ fn sample_sun_radiance(ray_dir_ws: vec3<f32>) -> vec3<f32> {
         let sun_angular_size = (*light).sun_disk_angular_size;
         let sun_intensity = (*light).sun_disk_intensity;
         if sun_angular_size > 0.0 && sun_intensity > 0.0 {
-            let factor = 1 - smoothstep(sun_angular_size * 0.5 - w, sun_angular_size * 0.5 + w, angle_to_sun);
+            let factor = 1
+                - smoothstep(sun_angular_size * 0.5 - w, sun_angular_size * 0.5 + w, angle_to_sun);
             let sun_solid_angle = (sun_angular_size * sun_angular_size) * 0.25 * PI;
-            sun_radiance += ((*light).color.rgb / sun_solid_angle) * sun_intensity * factor * shadow_factor;
+            sun_radiance += ((*light).color.rgb / sun_solid_angle) * sun_intensity * factor
+                * shadow_factor;
         }
     }
     return sun_radiance;

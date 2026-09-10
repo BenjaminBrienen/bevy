@@ -79,7 +79,8 @@ fn transmittance_lut_r_mu_to_uv(atm: Atmosphere, r: f32, mu: f32) -> vec2<f32> {
     let d = distance_to_top_atmosphere_boundary(atm, r, mu);
 
     // Minimum and maximum distance to the top atmosphere boundary from a point at height r
-    let d_min = atm.outer_radius - r; // length of the ray straight up to the top atmosphere boundary
+    let d_min = atm.outer_radius
+        - r; // length of the ray straight up to the top atmosphere boundary
     let d_max = rho + H; // length of the ray to the top atmosphere boundary and grazing the horizon
 
     let u = (d - d_min) / (d_max - d_min);

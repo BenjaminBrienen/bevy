@@ -50,14 +50,9 @@ fn is_alive(location: vec2<i32>, offset_x: i32, offset_y: i32) -> i32 {
 }
 
 fn count_alive(location: vec2<i32>) -> i32 {
-    return is_alive(location, -1, -1) +
-           is_alive(location, -1,  0) +
-           is_alive(location, -1,  1) +
-           is_alive(location,  0, -1) +
-           is_alive(location,  0,  1) +
-           is_alive(location,  1, -1) +
-           is_alive(location,  1,  0) +
-           is_alive(location,  1,  1);
+    return is_alive(location, -1, -1) + is_alive(location, -1, 0) + is_alive(location, -1, 1)
+        + is_alive(location, 0, -1) + is_alive(location, 0, 1) + is_alive(location, 1, -1)
+        + is_alive(location, 1, 0) + is_alive(location, 1, 1);
 }
 
 @compute @workgroup_size(8, 8, 1)

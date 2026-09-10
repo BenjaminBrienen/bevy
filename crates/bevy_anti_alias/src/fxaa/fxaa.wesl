@@ -120,13 +120,13 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let lumaUpCorners = lumaUpRight + lumaUpLeft;
 
     // Compute an estimation of the gradient along the horizontal and vertical axis.
-    let edgeHorizontal = abs(-2.0 * lumaLeft   + lumaLeftCorners)  + 
-                         abs(-2.0 * lumaCenter + lumaDownUp) * 2.0 + 
-                         abs(-2.0 * lumaRight  + lumaRightCorners);
+    let edgeHorizontal =
+        abs(-2.0 * lumaLeft + lumaLeftCorners) + abs(-2.0 * lumaCenter + lumaDownUp) * 2.0
+        + abs(-2.0 * lumaRight + lumaRightCorners);
 
-    let edgeVertical =   abs(-2.0 * lumaUp     + lumaUpCorners)       + 
-                         abs(-2.0 * lumaCenter + lumaLeftRight) * 2.0 + 
-                         abs(-2.0 * lumaDown   + lumaDownCorners);
+    let edgeVertical =
+        abs(-2.0 * lumaUp + lumaUpCorners) + abs(-2.0 * lumaCenter + lumaLeftRight) * 2.0
+        + abs(-2.0 * lumaDown + lumaDownCorners);
 
     // Is the local edge horizontal or vertical ?
     let isHorizontal = (edgeHorizontal >= edgeVertical);
@@ -251,7 +251,8 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
 
     // Sub-pixel shifting
     // Full weighted average of the luma over the 3x3 neighborhood.
-    let lumaAverage = (1.0 / 12.0) * (2.0 * (lumaDownUp + lumaLeftRight) + lumaLeftCorners + lumaRightCorners);
+    let lumaAverage = (1.0 / 12.0)
+        * (2.0 * (lumaDownUp + lumaLeftRight) + lumaLeftCorners + lumaRightCorners);
     // Ratio of the delta between the global average and the center luma, over the luma range in the 3x3 neighborhood.
     let subPixelOffset1 = clamp(abs(lumaAverage - lumaCenter) / lumaRange, 0.0, 1.0);
     let subPixelOffset2 = (-2.0 * subPixelOffset1 + 3.0) * subPixelOffset1 * subPixelOffset1;
