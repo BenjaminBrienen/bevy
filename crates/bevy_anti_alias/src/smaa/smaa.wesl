@@ -717,8 +717,11 @@ fn area_diag(dist: vec2<f32>, e: vec2<f32>, offset: f32) -> vec2<f32> {
  * This searches for diagonal patterns and returns the corresponding weights.
  */
 @if(SMAA_BLENDING_WEIGHT_CALCULATION && !SMAA_DISABLE_DIAG_DETECTION)
-fn calculate_diag_weights(tex_coord: vec2<f32>, e: vec2<f32>, subsample_indices: vec4<f32>)
-        -> vec2<f32> {
+fn calculate_diag_weights(
+    tex_coord: vec2<f32>,
+    e: vec2<f32>,
+    subsample_indices: vec4<f32>,
+) -> vec2<f32> {
     var weights = vec2(0.0, 0.0);
 
     // Search for the line ends:
@@ -917,9 +920,11 @@ fn area(dist: vec2<f32>, e1: f32, e2: f32, offset: f32) -> vec2<f32> {
 // Corner Detection Functions
 
 @if(SMAA_BLENDING_WEIGHT_CALCULATION)
-fn detect_horizontal_corner_pattern(weights: vec2<f32>, tex_coord: vec4<f32>, d: vec2<f32>) -> vec2<
-    f32,
-> {
+fn detect_horizontal_corner_pattern(
+    weights: vec2<f32>,
+    tex_coord: vec4<f32>,
+    d: vec2<f32>,
+) -> vec2<f32> {
     @if(!SMAA_DISABLE_CORNER_DETECTION) {
         let left_right = step(d.xy, d.yx);
         var rounding = (1.0 - SMAA_CORNER_ROUNDING_NORM) * left_right;
@@ -943,8 +948,11 @@ fn detect_horizontal_corner_pattern(weights: vec2<f32>, tex_coord: vec4<f32>, d:
 }
 
 @if(SMAA_BLENDING_WEIGHT_CALCULATION)
-fn detect_vertical_corner_pattern(weights: vec2<f32>, tex_coord: vec4<f32>, d: vec2<f32>) 
-        -> vec2<f32> {
+fn detect_vertical_corner_pattern(
+    weights: vec2<f32>,
+    tex_coord: vec4<f32>,
+    d: vec2<f32>,
+) -> vec2<f32> {
     @if(!SMAA_DISABLE_CORNER_DETECTION) {
         let left_right = step(d.xy, d.yx);
         var rounding = (1.0 - SMAA_CORNER_ROUNDING_NORM) * left_right;
@@ -972,8 +980,9 @@ fn detect_vertical_corner_pattern(weights: vec2<f32>, tex_coord: vec4<f32>, d: v
 
 @if(SMAA_BLENDING_WEIGHT_CALCULATION)
 @fragment
-fn blending_weight_calculation_fragment_main(in: BlendingWeightCalculationVaryings)
-        -> @location(0) vec4<f32> {
+fn blending_weight_calculation_fragment_main(
+    in: BlendingWeightCalculationVaryings,
+) -> @location(0) vec4<f32> {
     let subsample_indices = vec4(0.0); // Just pass zero for SMAA 1x, see @SUBSAMPLE_INDICES.
 
     var weights = vec4(0.0);

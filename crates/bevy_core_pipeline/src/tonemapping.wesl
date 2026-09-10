@@ -159,7 +159,11 @@ fn saturation(color: vec3<f32>, saturationAmount: f32) -> vec3<f32> {
     Similar to OCIO lg2 AllocationTransform.
     ref[0]
 */
-fn convertOpenDomainToNormalizedLog2_(color: vec3<f32>, minimum_ev: f32, maximum_ev: f32) -> vec3<f32> {
+fn convertOpenDomainToNormalizedLog2_(
+    color: vec3<f32>,
+    minimum_ev: f32,
+    maximum_ev: f32,
+) -> vec3<f32> {
     let in_midgray = 0.18;
 
     // remove negative before log transform
@@ -181,7 +185,11 @@ fn convertOpenDomainToNormalizedLog2_(color: vec3<f32>, minimum_ev: f32, maximum
 }
 
 // Inverse of above
-fn convertNormalizedLog2ToOpenDomain(color: vec3<f32>, minimum_ev: f32, maximum_ev: f32) -> vec3<f32> {
+fn convertNormalizedLog2ToOpenDomain(
+    color: vec3<f32>,
+    minimum_ev: f32,
+    maximum_ev: f32,
+) -> vec3<f32> {
     var open_color = color;
     let in_midgray = 0.18;
     let total_exposure = maximum_ev - minimum_ev;

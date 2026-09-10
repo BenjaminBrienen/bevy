@@ -343,7 +343,10 @@ fn quaternion_multiply(a: vec4<f32>, b: vec4<f32>) -> vec4<f32> {
     return vec4(a.w * b.xyz + b.w * a.xyz + cross(a.xyz, b.xyz), a.w * b.w - dot(a.xyz, b.xyz));
 }
 
-fn calculate_motion_vector(world_position: vec3<f32>, previous_world_position: vec3<f32>) -> vec2<f32> {
+fn calculate_motion_vector(
+    world_position: vec3<f32>,
+    previous_world_position: vec3<f32>,
+) -> vec2<f32> {
     let clip_position_t = view.unjittered_clip_from_world * vec4(world_position, 1.0);
     let clip_position = clip_position_t.xy / clip_position_t.w;
     let previous_clip_position_t = previous_view.unjittered_clip_from_world
@@ -355,7 +358,12 @@ fn calculate_motion_vector(world_position: vec3<f32>, previous_world_position: v
     return (clip_position - previous_clip_position) * vec2(0.5, -0.5);
 }
 
-fn env_brdf_approx2(specular_color: vec3<f32>, alpha: f32, N: vec3<f32>, V: vec3<f32>) -> vec3<f32> {
+fn env_brdf_approx2(
+    specular_color: vec3<f32>,
+    alpha: f32,
+    N: vec3<f32>,
+    V: vec3<f32>,
+) -> vec3<f32> {
     let NoV = abs(dot(N, V));
 
     var X: vec4<f32>;

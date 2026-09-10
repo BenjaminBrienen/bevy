@@ -20,7 +20,10 @@ fn mesh2d_position_world_to_clip(world_position: vec4<f32>) -> vec4<f32> {
 // NOTE: The intermediate world_position assignment is important
 // for precision purposes when using the 'equals' depth comparison
 // function.
-fn mesh2d_position_local_to_clip(world_from_local: mat4x4<f32>, vertex_position: vec4<f32>) -> vec4<f32> {
+fn mesh2d_position_local_to_clip(
+    world_from_local: mat4x4<f32>,
+    vertex_position: vec4<f32>,
+) -> vec4<f32> {
     let world_position = mesh2d_position_local_to_world(world_from_local, vertex_position);
     return mesh2d_position_world_to_clip(world_position);
 }
@@ -32,7 +35,10 @@ fn mesh2d_normal_local_to_world(vertex_normal: vec3<f32>, instance_index: u32) -
         ) * vertex_normal;
 }
 
-fn mesh2d_tangent_local_to_world(world_from_local: mat4x4<f32>, vertex_tangent: vec4<f32>) -> vec4<f32> {
+fn mesh2d_tangent_local_to_world(
+    world_from_local: mat4x4<f32>,
+    vertex_tangent: vec4<f32>,
+) -> vec4<f32> {
     return vec4<f32>(
             mat3x3<f32>(
                 world_from_local[0].xyz,

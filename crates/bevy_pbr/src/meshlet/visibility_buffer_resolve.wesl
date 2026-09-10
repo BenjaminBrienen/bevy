@@ -236,7 +236,10 @@ fn load_vertex(meshlet: ptr<function, Meshlet>, vertex_id: u32) -> MeshletVertex
 }
 
 @if(MESHLET_MESH_MATERIAL_PASS)
-fn normal_local_to_world(vertex_normal: vec3<f32>, instance_uniform: ptr<function, Mesh>) -> vec3<f32> {
+fn normal_local_to_world(
+    vertex_normal: vec3<f32>,
+    instance_uniform: ptr<function, Mesh>,
+) -> vec3<f32> {
     if any(vertex_normal != vec3<f32>(0.0)) {
         return normalize(
                 mat2x4_f32_to_mat3x3_unpack(

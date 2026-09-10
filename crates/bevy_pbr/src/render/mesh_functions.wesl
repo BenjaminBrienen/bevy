@@ -47,14 +47,20 @@ fn get_local_from_world(instance_index: u32) -> mat4x4<f32> {
     return inverse_model_4x4_no_trans * inverse_model_4x4_only_trans;
 }
 
-fn mesh_position_local_to_world(world_from_local: mat4x4<f32>, vertex_position: vec4<f32>) -> vec4<f32> {
+fn mesh_position_local_to_world(
+    world_from_local: mat4x4<f32>,
+    vertex_position: vec4<f32>,
+) -> vec4<f32> {
     return world_from_local * vertex_position;
 }
 
 // NOTE: The intermediate world_position assignment is important
 // for precision purposes when using the 'equals' depth comparison
 // function.
-fn mesh_position_local_to_clip(world_from_local: mat4x4<f32>, vertex_position: vec4<f32>) -> vec4<f32> {
+fn mesh_position_local_to_clip(
+    world_from_local: mat4x4<f32>,
+    vertex_position: vec4<f32>,
+) -> vec4<f32> {
     let world_position = mesh_position_local_to_world(world_from_local, vertex_position);
     return position_world_to_clip(world_position.xyz);
 }

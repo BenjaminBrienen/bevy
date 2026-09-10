@@ -854,7 +854,7 @@ fn point_light(
 fn spot_light(
     light_id: u32,
     input: ptr<function, LightingInput>,
-    enable_diffuse: bool
+    enable_diffuse: bool,
 ) -> vec3<f32> {
     // reuse the point light calculations
     let point_light = point_light(light_id, input, enable_diffuse, false);
